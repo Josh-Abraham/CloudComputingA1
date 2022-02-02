@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<head>
+    <title>ECE1779 Assignment One</title>
+    <link rel="stylesheet" href='/static/core-style.css' />
+</head>
+<html>
+    <body>
+        {% include "top_bar.html" %}
+        <h3>Upload Key-Image Pair</h3>
+            <form class="form-outline">
+                <label for="key">Insert key:</label><br>
+                <input type="text" id="key" name="key" class="type-select">
+                
+                <br><br>
+
+                <label for="img_url">Insert image URL or select a file:</label><br>
+                <input type="text" id="img_url" name="img_url" class="type-select">
+                <input type="file" id="img_file" accept="image/*" name="img_file" class="hidden"/> 
+                <label for="img_file" class="select_button">Select file</label>
+
+                <input type="submit" class="submit-button" value="Submit New Key-Image Pair">
+              </form>              
+    <body>    
+</html>
