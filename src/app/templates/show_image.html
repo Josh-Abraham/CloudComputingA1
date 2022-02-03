@@ -16,7 +16,7 @@
         <div>
             {% if key is defined %}
                 <h4>Image:</h4>
-                <img src= "{{ url_for('get_image', key=key) }}"/>
+                <img src= "{{ url_for('get_image', key=key) }}" class="image-preview"/>
             {% endif %}
         </div>
     </body>
