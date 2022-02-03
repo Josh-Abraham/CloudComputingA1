@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<head>
+    <title>ECE1779 Assignment One</title>
+    <link rel="stylesheet" href='/static/core-style.css' />
+</head>
+<html>
+    <body>
+        {% include "top_bar.html" %}
+        <h3>Show Image</h3>
+        <form class="form-outline" method="post">
+            <label for="key">Key:</label><br>
+            <input type="text" id="key" name="key" class="type-select">
+            <input type="submit" class="submit-button" value="Submit Key">
+        </form> 
+        {% block content %}
+            {% if key %}
+                <img src= "{{ url_for('get_image', key=key) }}"/>
+            {% endif %}
+        {% endblock %}
+    </body>
+</html>    
