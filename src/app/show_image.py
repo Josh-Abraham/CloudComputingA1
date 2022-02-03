@@ -4,7 +4,7 @@ from app import webapp
 @webapp.route('/show_image', methods = ['GET','POST'])
 def show_image():
     if request.method == 'POST':
-        key = request.form['key']
+        key = request.form.get('key')
         return render_template('show_image.html', key=key)
     return render_template('show_image.html')
 
