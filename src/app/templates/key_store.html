@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }}</title>
+        {% else %}
+        <title>Key Storage</title>
+        {% endif %}
+	    <link rel="stylesheet" href='/static/core-style.css' />
+    </head>
+    <body>
+	    {% include "top_bar.html" %}
+        <h2>List of keys stored in the database</h2>
+	    <p>
+	        <h6>Total number of keys= {{total}}</h6>
+        <p>
+	    {% for key in keys %}
+            <div><b>{{ key }}</b><br></div>
+        {% endfor %}
+	    </p>
+    </body>
+</html>
