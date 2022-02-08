@@ -81,3 +81,9 @@ h3 {
 .submit-button:hover {
   background-color: #47bfd1;
 }
+
+
+.image-preview {
+  max-width: 100%;
+  max-height: calc(100vh - 200px);
+}
