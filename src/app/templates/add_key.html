@@ -7,7 +7,13 @@
     <body>
         {% include "top_bar.html" %}
         <h3>Upload Key-Image Pair</h3>
-        <form class="form-outline" method="post" onsubmit="return validateForm()" enctype=multipart/form-data>
+        <form 
+            class="form-outline"
+            style="height: 260px"
+            method="post"
+            onsubmit="return validateForm()"
+            enctype=multipart/form-data>
+
             <label for="key">Insert key:</label><br>
             <input type="text" id="key" name="key" class="type-select">
             
@@ -34,6 +40,16 @@
             </div>
 
             <input type="submit" id="submit" class="submit-button" value="Submit New Key-Image Pair">
+
+            <div>
+                {% if save_status is defined %}
+                    {% if save_status == "OK" %}
+                        <h4 style="text-align: center; color: green">Image Successfully Added</h4>
+                    {% else %}
+                        <h4 style="text-align: center; color: rgb(172, 16, 16)">Invalid - Image Not Added</h4>
+                    {% endif %}
+                {% endif %}
+            </div>
         </form>    
     
         <script>

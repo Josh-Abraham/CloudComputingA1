@@ -1,6 +1,6 @@
 from flask import render_template, request, send_file
 from app import webapp, UPLOAD_FOLDER
-import os, requests
+import os, requests, json
 
 
 @webapp.route('/')
@@ -13,7 +13,7 @@ def add_key():
     if request.method == 'POST':
         key = request.form.get('key')
         status = save_image(request, key)
-        return render_template("add_key.html")
+        return render_template("add_key.html", save_status=status)
     return render_template("add_key.html")
 
 @webapp.route('/show_image', methods = ['GET','POST'])
@@ -39,7 +39,7 @@ def save_image(request, key):
         file.save(os.path.join(UPLOAD_FOLDER, filename))
         jsonReq = {key:filename}
         res = requests.post('http://localhost:5001/put', json=jsonReq)
-        return res
+        return str(res.json())
     
     try:
         response = requests.get(img_url)
@@ -50,7 +50,7 @@ def save_image(request, key):
                 f.write(response.content)
             jsonReq = {key:filename}
             res = requests.post('http://localhost:5001/put', json=jsonReq)
-            return res
+            return str(res.json())
         return "INVALID"
     except:
         return "INVALID"
