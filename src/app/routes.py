@@ -40,7 +40,7 @@ def save_image(request, key):
         jsonReq = {key:filename}
         res = requests.post('http://localhost:5001/put', json=jsonReq)
         return str(res.json())
-    
+
     try:
         response = requests.get(img_url)
         if response.status_code == 200:
@@ -57,6 +57,6 @@ def save_image(request, key):
 
 @webapp.route('/key_store')
 def key_store():
-    keys = [0, 1, 2, 3, 4]
+    keys = [1,2,3,4,5] #will recieve keys from either memcache or db
     total=len(keys)
     return render_template('key_store.html', title='Home', keys=keys, total=total)
