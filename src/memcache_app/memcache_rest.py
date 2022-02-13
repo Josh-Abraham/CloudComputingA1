@@ -12,22 +12,27 @@ def put():
         response = memcache_obj.updateitem(key, value)
     else:
         response = memcache_obj.pushitem(key, value)
-    print("HELLO")
     print(response)
     return get_response()
 
-@webapp.route('/clear', methods = ['GET', 'POST'])
+@webapp.route('/CLEAR', methods = ['GET', 'POST'])
 def clear():
-    print("hello")
     memcache_obj.clear_cache()
     return get_response()
 
 
-def get_response():
-    response = webapp.response_class(
-        response=json.dumps("OK"),
-        status=200,
-        mimetype='application/json'
-    )
+def get_response(input=False):
+    if input:
+        response = webapp.response_class(
+            response=json.dumps("OK"),
+            status=200,
+            mimetype='application/json'
+        )
+    else:
+        response = webapp.response_class(
+            response=json.dumps("Bad Request"),
+            status=400,
+            mimetype='application/json'
+        )
 
     return response
