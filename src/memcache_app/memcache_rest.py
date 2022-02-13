@@ -1,4 +1,4 @@
-from memcache_app import memcache, webapp
+from memcache_app import memcache_obj, webapp
 from flask import request
 import json
 
@@ -6,19 +6,20 @@ import json
 def put():
     req_json = request.get_json(force=True) 
     key, value = list(req_json.items())[0]
-    
-    if key in memcache:
-        # Remove old key from dictionary
-        memcache.pop(key)
-
-    # TODO: Add the memory replacement logic here
-    memcache[key] = value
-
+    response = None
+    if memcache_obj.getitem(key) != None:
+        # Replace item if it exists
+        response = memcache_obj.updateitem(key, value)
+    else:
+        response = memcache_obj.pushitem(key, value)
+    print("HELLO")
+    print(response)
     return get_response()
 
 @webapp.route('/clear', methods = ['GET', 'POST'])
 def clear():
-    memcache.clear()
+    print("hello")
+    memcache_obj.clear_cache()
     return get_response()
 
 
