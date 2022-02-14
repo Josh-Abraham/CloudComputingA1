@@ -1,6 +1,7 @@
 from flask import render_template, request, send_file, redirect, url_for, g
 from app import webapp
-from db_connection import get_db
+from app.db_connection import get_db
+from app.image_utils import save_image
 import requests
 
 

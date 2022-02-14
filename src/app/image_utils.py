@@ -1,6 +1,6 @@
 from app import UPLOAD_FOLDER
 import os, requests
-from db_connection import get_db
+from app.db_connection import get_db
 
 
 def save_image(request, key):
@@ -12,8 +12,8 @@ def save_image(request, key):
         file.save(os.path.join(UPLOAD_FOLDER, filename))
         jsonReq = {key:filename}
         res = requests.post('http://localhost:5001/put', json=jsonReq)
-        return str(res.json())
-    
+        write_img_db(key, filename)
+        return "OK"    
     try:
         response = requests.get(img_url)
         if response.status_code == 200:
@@ -23,7 +23,8 @@ def save_image(request, key):
                 f.write(response.content)
             jsonReq = {key:filename}
             res = requests.post('http://localhost:5001/put', json=jsonReq)
-            return str(res.json())
+            write_img_db(key, filename)
+            return "OK"
         return "INVALID"
     except:
         return "INVALID"
@@ -36,15 +37,17 @@ def write_img_db(image_key, image_tag):
 
 
     cnx = get_db()
-    cursor = cnx.cursor()
-    query_exists = "SELECT EXISTS(SELECT 1 FROM image_table WHERE image_key = %s)"
-    cursor.execute(query_exists,(image_key))
-    print(cursor)
-    # query = ''' INSERT INTO image_table (image_key,image_tag)
-    #                    VALUES (%s,%s)
-    # '''
+    cursor = cnx.cursor(buffered = True)
+    query_exists = "SELECT EXISTS(SELECT 1 FROM image_table WHERE image_key = (%s))"
+    cursor.execute(query_exists,(image_key,))
+    for elem in cursor:
+        if elem[0] == 1:
+            query_remove = '''DELETE FROM image_table WHERE image_key=%s'''
+            cursor.execute(query_remove,(image_key,))
+            break;
 
-    # cursor.execute(query,(image_key,image_tag))
-    # cnx.commit()
+    query_add = ''' INSERT INTO image_table (image_key,image_tag) VALUES (%s,%s)'''
+    cursor.execute(query_add,(image_key,image_tag))
+    cnx.commit()
 
-    return True
+    # return True
