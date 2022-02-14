@@ -1,6 +1,26 @@
-from flask import render_template, request, send_file
+from flask import render_template, request, send_file, redirect, url_for, g
 from app import webapp, UPLOAD_FOLDER
 import os, requests, json
+import mysql.connector
+from app.config import db_config
+
+def connect_to_database():
+    return mysql.connector.connect(user=db_config['user'],
+                                   password=db_config['password'],
+                                   host=db_config['host'],
+                                   database=db_config['database'])
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = connect_to_database()
+    return db
+
+@webapp.teardown_appcontext
+def teardown_db(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 @webapp.route('/')
@@ -20,6 +40,8 @@ def add_key():
 def show_image():
     if request.method == 'POST':
         key = request.form.get('key')
+        jsonReq={"keyReq":key}
+        res= requests.post('http://localhost:5001/get', json=jsonReq)
         return render_template('show_image.html', key=key)
     return render_template('show_image.html')
 
@@ -40,7 +62,7 @@ def save_image(request, key):
         jsonReq = {key:filename}
         res = requests.post('http://localhost:5001/put', json=jsonReq)
         return str(res.json())
-    
+
     try:
         response = requests.get(img_url)
         if response.status_code == 200:
@@ -57,6 +79,15 @@ def save_image(request, key):
 
 @webapp.route('/key_store')
 def key_store():
-    keys = [0, 1, 2, 3, 4]
+    cnx = get_db()
+    cursor = cnx.cursor()
+    query = "SELECT image_key FROM image_table"
+    cursor.execute(query)
+    keys = [] #will recieve keys from either memcache or db
+    for key in cursor:
+        keys.append(key[0])
     total=len(keys)
-    return render_template('key_store.html', title='Home', keys=keys, total=total)
+    if keys:
+        return render_template('key_store.html', keys=keys, total=total)
+    else:
+        return render_template('key_store.html')

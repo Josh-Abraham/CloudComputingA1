@@ -1,22 +1,26 @@
 <!doctype html>
 <html>
     <head>
-        {% if title %}
-        <title>{{ title }}</title>
-        {% else %}
-        <title>Key Storage</title>
-        {% endif %}
+        <title>ECE1779 Assignment One</title>
 	    <link rel="stylesheet" href='/static/core-style.css' />
     </head>
     <body>
 	    {% include "top_bar.html" %}
-        <h2>List of keys stored in the database</h2>
-	    <p>
-	        <h6>Total number of keys= {{total}}</h6>
-        <p>
-	    {% for key in keys %}
-            <div><b>{{ key }}</b><br></div>
-        {% endfor %}
-	    </p>
+
+        {% if (keys is defined) and keys %}
+            <h1><b>List of keys stored in the database</b></h1>
+	        <p>
+	            <h3>Total number of keys= {{total}}</h3>
+            </p>
+            <u><b>List</b></u>
+            <br>
+	        {% for key in keys %}
+                <div><b>{{ key }}</b><br></div>
+            {% endfor %}
+
+        {% else %}
+            <h3>There are no keys stored</h3>
+
+        {% endif %}
     </body>
 </html>
