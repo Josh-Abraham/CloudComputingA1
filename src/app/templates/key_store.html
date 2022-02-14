@@ -8,10 +8,12 @@
 	    {% include "top_bar.html" %}
 
         {% if (keys is defined) and keys %}
-            <h2>List of keys stored in the database</h2>
+            <h1><b>List of keys stored in the database</b></h1>
 	        <p>
-	            <h6>Total number of keys= {{total}}</h6>
+	            <h3>Total number of keys= {{total}}</h3>
             </p>
+            <u><b>List</b></u>
+            <br>
 	        {% for key in keys %}
                 <div><b>{{ key }}</b><br></div>
             {% endfor %}

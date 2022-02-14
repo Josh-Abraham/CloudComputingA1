@@ -24,7 +24,7 @@ def clear():
 @webapp.route('/get', methods = ['POST'])
 def get():
     req_json = request.get_json(force=True)
-    key = list(req_json.items())[0]
+    key = req_json["keyReq"]
     if key in memcache:
         return memcache[key]
     return get_response_no_key()
