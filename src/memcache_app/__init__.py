@@ -1,12 +1,14 @@
 from flask import Flask
+from memcache_app import memcache
+from cachetools import LRUCache, RRCache
 import os
 
-global memcache
-
 webapp = Flask(__name__)
-memcache = {}
+global memcache_obj
+base_cache = memcache.get_cache(LRUCache)
+memcache_obj = base_cache(2)
 
 
-from memcache_app import mem_cache_utils
+from memcache_app import memcache_rest
 
 

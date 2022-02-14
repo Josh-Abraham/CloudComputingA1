@@ -1,8 +1,10 @@
 from cachetools import LRUCache, RRCache
 import random
 import time
-import constants
+from memcache_app import constants
+from threading import Lock
 
+lock = Lock()
 
 #[todo] logging
 def get_cache(cache):
@@ -50,6 +52,11 @@ def get_cache(cache):
                 # print(response)
                 self.hit += 1
             return response
+
+        def clear_cache(self):
+            with lock:
+                while self.currsize > 0:
+                    self.popitem()
 
         def __copy__(self, size):
             if (self.replace_policy == constants.LRU):
