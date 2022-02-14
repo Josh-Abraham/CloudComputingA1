@@ -91,3 +91,11 @@ def key_store():
         return render_template('key_store.html', keys=keys, total=total)
     else:
         return render_template('key_store.html')
+
+@webapp.route('/memcache_params', methods = ['GET','POST'])
+def memcache_params():
+    if request.method == 'POST':
+        return render_template('memcache_params.html')
+    capacity = "100MB"
+    replacement_policy = "LRU"
+    return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy)

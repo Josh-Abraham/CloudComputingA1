@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<head>
+    <title>ECE1779 Assignment One</title>
+    <link rel="stylesheet" href='/static/core-style.css' />
+</head>
+<html>
+    <body>
+        {% include "top_bar.html" %}
+        <h3>Update Memory Cache Configuration</h3>
+        <form 
+            class="form-outline"
+            style="height: 260px"
+            method="post">
+
+            <label for="capacity">Insert capacity:</label>
+            <input 
+                type="text"
+                id="capacity"
+                name="capacity"
+                value="{{ capacity }}"
+                class="type-select">
+             
+            <label for="cache_replacement" class="label-padding">
+                Select memory cache replacement policy:
+            </label>
+            {% if replacement_policy == "LRU" %}
+            <div>
+                <input type="radio" id="lru" name="drone" checked value="lru">
+                <label for="lru">Least Recently Used</label>
+            </div>
+            <div>
+                <input type="radio" id="random" name="drone" value="random">
+                <label for="random">Random Replacement</label>
+            </div>
+            {% else %}
+            <div>
+                <input type="radio" id="lru" name="drone" value="lru">
+                <label for="lru">Least Recently Used</label>
+            </div>
+            <div>
+                <input type="radio" id="random" name="drone" checked value="random">
+                <label for="random">Random Replacement</label>
+            </div>
+            {% endif %}
+            <div>
+                <!-- {% if capacity is defined %}
+                    {% if save_status == "OK" %}
+                        <h4 style="text-align: center; color: green">Image Successfully Added</h4>
+                    {% else %}
+                        <h4 style="text-align: center; color: rgb(172, 16, 16)">Invalid - Image Not Added</h4>
+                    {% endif %}
+                {% endif %} -->
+            </div>
+        </form>    
+        
+        
+        
+        
+    <body>    
+</html>

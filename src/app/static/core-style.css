@@ -87,3 +87,7 @@ h3 {
   max-width: 100%;
   max-height: calc(100vh - 200px);
 }
+
+.label-padding {
+  line-height: 30px;
+}
