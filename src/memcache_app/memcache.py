@@ -9,7 +9,7 @@ lock = Lock()
 #[todo] logging
 def get_cache(cache):
     class MemCache(cache):
-        
+
         def __init__(self, size):
             if (cache == LRUCache):
                 super().__init__(maxsize = self.MB_to_Bytes(size), getsizeof= None)
@@ -21,7 +21,7 @@ def get_cache(cache):
             self.current_size = 0
             self.hit = 0
             self.miss = 0
-        
+
         def pushitem(self, key, value):
             response = self.__setitem__(key, value)
             return response
@@ -43,7 +43,7 @@ def get_cache(cache):
                     self.current_size -= len(value)
                     return(key, value)
             return None
-        
+
         def getitem(self, key):
             response = self.__getitem__(key)
             if(response == None):
@@ -86,7 +86,7 @@ def get_cache(cache):
             if(self.current_size + len(value) >= self.maximum_size):
                 while(self.current_size + len(value)>= self.maximum_size and self.currsize > 0):
                     self.popitem()
-            
+
             if(key != None and value != None):
                 super().__setitem__(key, value)
                 self.current_size +=  len(value)
