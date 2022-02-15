@@ -34,7 +34,6 @@ def get_cache(cache):
                 self.current_size -= len(current_value)
                 self._Cache__data[key] = new_value
                 self.current_size += len(new_value)
-                self.access_count += 1
                 return True
             return False
 
@@ -57,6 +56,16 @@ def get_cache(cache):
             self.access_count += 1
             return response
 
+        def invalidate(self, key):
+            #TODO: Does Invalidate increment access count?
+            response = self.__getitem__(key)
+            if(response != None):
+                (_, value) = response
+                super().pop(key)
+                self.current_size -= len(value)
+                return "OK"
+            return None
+        
         def clear_cache(self):
             with lock:
                 while self.currsize > 0:

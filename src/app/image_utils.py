@@ -10,8 +10,8 @@ def save_image(request, key):
         _, extension = os.path.splitext(file.filename)
         filename = key + extension
         file.save(os.path.join(UPLOAD_FOLDER, filename))
-        jsonReq = {key:filename}
-        res = requests.post('http://localhost:5001/put', json=jsonReq)
+        jsonReq = {"key":key}
+        res = requests.post('http://localhost:5001/invalidate', json=jsonReq)
         return write_img_db(key, filename)
     try:
         response = requests.get(img_url)
@@ -20,8 +20,8 @@ def save_image(request, key):
             filename = key + extension
             with open(UPLOAD_FOLDER + "/" + filename, 'wb') as f:
                 f.write(response.content)
-            jsonReq = {key:filename}
-            res = requests.post('http://localhost:5001/put', json=jsonReq)
+            jsonReq = {"key":key}
+            res = requests.post('http://localhost:5001/invalidate', json=jsonReq)
             return write_img_db(key, filename)
         return "INVALID"
     except:
