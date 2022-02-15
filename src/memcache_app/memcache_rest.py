@@ -6,13 +6,7 @@ import json
 def put():
     req_json = request.get_json(force=True) 
     key, value = list(req_json.items())[0]
-    response = None
-    if memcache_obj.getitem(key) != None:
-        # Replace item if it exists
-        response = memcache_obj.updateitem(key, value)
-    else:
-        response = memcache_obj.pushitem(key, value)
-    print(response)
+    memcache_obj.pushitem(key, value)
     return get_response()
 
 @webapp.route('/clear', methods = ['GET', 'POST'])
@@ -31,12 +25,8 @@ def get():
 @webapp.route('/invalidate', methods = ['POST'])
 def invalidate():
     req_json = request.get_json(force=True)
-    key = list(req_json.items())[0]
-
-    if key in memcache_obj:
-        memcache_obj.popitem(key)
-        return get_response()
-    return get_response_no_key()
+    memcache_obj.invalidate(req_json["key"])
+    return get_response(True)
 
 def get_response(input=False):
     if input:
