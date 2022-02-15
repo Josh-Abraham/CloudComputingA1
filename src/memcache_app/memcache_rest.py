@@ -13,7 +13,7 @@ def put():
     else:
         response = memcache_obj.pushitem(key, value)
     print(response)
-    return get_response()
+    return put_response()
 
 @webapp.route('/clear', methods = ['GET', 'POST'])
 def clear():
@@ -68,6 +68,15 @@ def get_response_no_key():
     response = webapp.response_class(
         response=json.dumps("Unknown key"),
         status=400,
+        mimetype='application/json'
+    )
+
+    return response
+
+def put_response():
+    response = webapp.response_class(
+        response=json.dumps("OK"),
+        status=200,
         mimetype='application/json'
     )
 
