@@ -45,8 +45,10 @@
                 {% if save_status is defined %}
                     {% if save_status == "OK" %}
                         <h4 style="text-align: center; color: green">Image Successfully Added</h4>
+                    {% elif save_status == "FAILURE" %}
+                        <h4 style="text-align: center; color: rgb(172, 16, 16)">Database Failure - Image Not Added</h4>
                     {% else %}
-                        <h4 style="text-align: center; color: rgb(172, 16, 16)">Invalid - Image Not Added</h4>
+                        <h4 style="text-align: center; color: rgb(172, 16, 16)">Invalid Image - Image Not Added</h4>
                     {% endif %}
                 {% endif %}
             </div>
