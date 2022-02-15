@@ -9,49 +9,50 @@
         <h3>Update Memory Cache Configuration</h3>
         <form 
             class="form-outline"
-            style="height: 260px"
+            style="height: 200px; width: 600px"
             method="post">
-
+            <label>Memcache Last Configured: <b>{{ update_time }}</b></label><br><br>
             <label for="capacity">Insert capacity:</label>
             <input 
                 type="text"
                 id="capacity"
                 name="capacity"
                 value="{{ capacity }}"
-                class="type-select">
+                class="type-select"><br>
              
-            <label for="cache_replacement" class="label-padding">
+            <label for="replacement_policy" class="label-padding">
                 Select memory cache replacement policy:
             </label>
             {% if replacement_policy == "LRU" %}
             <div>
-                <input type="radio" id="lru" name="drone" checked value="lru">
+                <input type="radio" id="lru" name="replacement_policy" checked value="lru">
                 <label for="lru">Least Recently Used</label>
             </div>
             <div>
-                <input type="radio" id="random" name="drone" value="random">
+                <input type="radio" id="random" name="replacement_policy" value="random">
                 <label for="random">Random Replacement</label>
             </div>
             {% else %}
             <div>
-                <input type="radio" id="lru" name="drone" value="lru">
+                <input type="radio" id="lru" name="replacement_policy" value="lru">
                 <label for="lru">Least Recently Used</label>
             </div>
             <div>
-                <input type="radio" id="random" name="drone" checked value="random">
+                <input type="radio" id="random" name="replacement_policy" checked value="random">
                 <label for="random">Random Replacement</label>
             </div>
             {% endif %}
-            <div>
-                <!-- {% if capacity is defined %}
-                    {% if save_status == "OK" %}
-                        <h4 style="text-align: center; color: green">Image Successfully Added</h4>
-                    {% else %}
-                        <h4 style="text-align: center; color: rgb(172, 16, 16)">Invalid - Image Not Added</h4>
-                    {% endif %}
-                {% endif %} -->
-            </div>
+            <input type="submit" id="submit" class="submit-button" value="Update Configuration">
         </form>    
+        <form method="post" class="cache-form">
+            <input name="clear_cache" style="visibility: collapse; height: 0px">
+            <input
+                type="submit"
+                id="clear_cache"
+                class="submit-button"
+                style="margin-top: -30px"
+                value="Clear Cache">
+        </form>
         
         
         

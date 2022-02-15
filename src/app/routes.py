@@ -3,7 +3,10 @@ from app import webapp
 from app.db_connection import get_db
 from app.image_utils import save_image
 import requests
+import time
+import datetime
 
+update_time = time.ctime(time.time())
 
 @webapp.teardown_appcontext
 def teardown_db(exception):
@@ -60,10 +63,28 @@ def key_store():
     else:
         return render_template('key_store.html')
 
+
 @webapp.route('/memcache_params', methods = ['GET','POST'])
 def memcache_params():
-    if request.method == 'POST':
-        return render_template('memcache_params.html')
+    # TODO: Add in a DB call to get base values
+    global update_time
     capacity = "100MB"
-    replacement_policy = "LRU"
-    return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy)
+    replacement_policy = "LRU" 
+    date = datetime.datetime.strptime(update_time, "%a %b %d %H:%M:%S %Y")
+    date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
+
+    if request.method == 'POST':
+        print(request.form)
+        if not request.form.get("clear_cache") == None:
+            requests.post('http://localhost:5001/clear')
+            return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
+        else:
+            new_cap = request.form.get('capacity')
+            if not new_cap == "":
+                capacity = new_cap
+            replacement_policy = request.form.get('replacement_policy')
+            update_time = time.ctime(time.time())
+            date = datetime.datetime.strptime(update_time, "%a %b %d %H:%M:%S %Y")
+            date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
+            return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
+    return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
