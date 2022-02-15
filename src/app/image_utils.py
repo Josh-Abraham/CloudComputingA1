@@ -12,8 +12,7 @@ def save_image(request, key):
         file.save(os.path.join(UPLOAD_FOLDER, filename))
         jsonReq = {key:filename}
         res = requests.post('http://localhost:5001/put', json=jsonReq)
-        write_img_db(key, filename)
-        return "OK"    
+        return write_img_db(key, filename)
     try:
         response = requests.get(img_url)
         if response.status_code == 200:
@@ -23,8 +22,7 @@ def save_image(request, key):
                 f.write(response.content)
             jsonReq = {key:filename}
             res = requests.post('http://localhost:5001/put', json=jsonReq)
-            write_img_db(key, filename)
-            return "OK"
+            return write_img_db(key, filename)
         return "INVALID"
     except:
         return "INVALID"
@@ -32,22 +30,23 @@ def save_image(request, key):
 def write_img_db(image_key, image_tag):
 
     if image_key == "" or image_tag == "":
-        error_msg="Error: All fields are required!"
-    
+        error_msg="FAILURE"
+        return error_msg
+    try:
+        cnx = get_db()
+        cursor = cnx.cursor(buffered = True)
+        query_exists = "SELECT EXISTS(SELECT 1 FROM image_table WHERE image_key = (%s))"
+        cursor.execute(query_exists,(image_key,))
+        for elem in cursor:
+            if elem[0] == 1:
+                query_remove = '''DELETE FROM image_table WHERE image_key=%s'''
+                cursor.execute(query_remove,(image_key,))
+                break
 
+        query_add = ''' INSERT INTO image_table (image_key,image_tag) VALUES (%s,%s)'''
+        cursor.execute(query_add,(image_key,image_tag))
+        cnx.commit()
 
-    cnx = get_db()
-    cursor = cnx.cursor(buffered = True)
-    query_exists = "SELECT EXISTS(SELECT 1 FROM image_table WHERE image_key = (%s))"
-    cursor.execute(query_exists,(image_key,))
-    for elem in cursor:
-        if elem[0] == 1:
-            query_remove = '''DELETE FROM image_table WHERE image_key=%s'''
-            cursor.execute(query_remove,(image_key,))
-            break;
-
-    query_add = ''' INSERT INTO image_table (image_key,image_tag) VALUES (%s,%s)'''
-    cursor.execute(query_add,(image_key,image_tag))
-    cnx.commit()
-
-    # return True
+        return "OK"
+    except:
+        return "FAILURE"

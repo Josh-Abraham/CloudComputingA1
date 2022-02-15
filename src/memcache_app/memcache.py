@@ -21,17 +21,20 @@ def get_cache(cache):
             self.current_size = 0
             self.hit = 0
             self.miss = 0
+            self.access_count = 0
         
         def pushitem(self, key, value):
             response = self.__setitem__(key, value)
+            self.access_count += 1
             return response
 
         def updateitem(self, key, new_value):
-            current_value = self._Cache__data[key]
             if(self.__getitem__(key)):
+                current_value = self._Cache__data[key]
                 self.current_size -= len(current_value)
                 self._Cache__data[key] = new_value
                 self.current_size += len(new_value)
+                self.access_count += 1
                 return True
             return False
 
@@ -51,6 +54,7 @@ def get_cache(cache):
             else:
                 # print(response)
                 self.hit += 1
+            self.access_count += 1
             return response
 
         def clear_cache(self):
