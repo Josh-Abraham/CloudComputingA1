@@ -22,7 +22,7 @@ def teardown_db(exception):
 def home():
     return render_template("home.html")
 
-@webapp.route('/addKey', methods = ['GET','POST'])
+@webapp.route('/add_key', methods = ['GET','POST'])
 def add_key():
     if request.method == 'POST':
         key = request.form.get('key')
