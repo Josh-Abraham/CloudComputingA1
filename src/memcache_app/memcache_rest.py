@@ -4,7 +4,7 @@ import json
 
 @webapp.route('/put', methods = ['POST'])
 def put():
-    req_json = request.get_json(force=True) 
+    req_json = request.get_json(force=True)
     key, value = list(req_json.items())[0]
     memcache_obj.pushitem(key, value)
     return get_response()
@@ -18,9 +18,19 @@ def clear():
 def get():
     req_json = request.get_json(force=True)
     key = req_json["keyReq"]
-    if key in memcache_obj:
-        return memcache_obj[key]
-    return get_response_no_key()
+    response=memcache_obj.getitem(key)
+    if response==None:
+        print (response)
+        return "Unknown key"
+        #check db and put into memcache
+    else:
+        print (response)
+        return response
+
+@webapp.route('/test/<key>/<value>')
+def test(key,value):
+    response=memcache_obj.pushitem(key,value)
+    return get_response(response)
 
 @webapp.route('/invalidate', methods = ['POST'])
 def invalidate():
@@ -48,6 +58,15 @@ def get_response_no_key():
     response = webapp.response_class(
         response=json.dumps("Unknown key"),
         status=400,
+        mimetype='application/json'
+    )
+
+    return response
+
+def put_response():
+    response = webapp.response_class(
+        response=json.dumps("OK"),
+        status=200,
         mimetype='application/json'
     )
 
