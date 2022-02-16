@@ -11,13 +11,17 @@
             <label for="key">Key:</label><br>
             <input type="text" id="key" name="key" class="type-select">
             <input type="submit" class="submit-button" value="Submit Key">
-        </form> 
+        </form>
         <br>
         <div>
-            {% if key is defined %}
-                <h4>Image:</h4>
-                <img src= "{{ url_for('get_image', key=key) }}" class="image-preview"/>
+            {% if filename is defined %}
+                {% if exists %}
+                    <h4>Image:</h4>
+                    <img src= "{{ url_for('get_image', filename=filename) }}" alt={{filename}}  class="image-preview"/>
+                {% else %}
+                    <h4>Image Not Present</h4>
+                {% endif %}
             {% endif %}
         </div>
     </body>
-</html>    
+</html>

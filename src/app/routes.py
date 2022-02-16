@@ -25,7 +25,7 @@ def teardown_db(exception):
 def home():
     return render_template("home.html")
 
-@webapp.route('/addKey', methods = ['GET','POST'])
+@webapp.route('/add_key', methods = ['GET','POST'])
 def add_key():
     if request.method == 'POST':
         key = request.form.get('key')
@@ -39,13 +39,34 @@ def show_image():
         key = request.form.get('key')
         jsonReq={"keyReq":key}
         res= requests.post('http://localhost:5001/get', json=jsonReq)
-        return render_template('show_image.html', key=key)
+        if(res.text=='Unknown key'):#res.text is the file path of the image from the memcache
+            #get from db and update memcache
+            cnx = get_db()
+            cursor = cnx.cursor(buffered=True)
+            query = "SELECT image_tag FROM image_table where image_key= %s"
+            cursor.execute(query, (key,))
+            if(cursor._rowcount):# if key exists in db
+                image_tag=str(cursor.fetchone()[0]) #cursor[0] is the imagetag recieved from the db
+                #close the db connection
+                cnx.close()
+
+                #put into memcache
+                filename=image_tag
+                jsonReq = {key:filename}
+                res = requests.post('http://localhost:5001/put', json=jsonReq)
+                return render_template('show_image.html', exists=True, filename=filename)
+            else:#the key is not found in the db
+                return render_template('show_image.html', exists=False, filename="does not exist")
+
+        else:# the key was found in memcache
+            print("memcache response is:", res.text)
+            return render_template('show_image.html', exists=True, filename=res.text)
     return render_template('show_image.html')
 
 # this endpoint just returns the image. The key is the filename with extension
-@webapp.route("/get_image/<key>")
-def get_image(key):
-    filepath = "static/images/" + key
+@webapp.route("/get_image/<filename>")
+def get_image(filename):
+    filepath = "static/images/" + filename
     return send_file(filepath)
 
 @webapp.route('/key_store')
@@ -58,6 +79,10 @@ def key_store():
     for key in cursor:
         keys.append(key[0])
     total=len(keys)
+    
+    #close db connection
+    cnx.close()
+
     if keys:
         return render_template('key_store.html', keys=keys, total=total)
     else:
