@@ -19,10 +19,10 @@ def set_cache_params(max_capacity, replacement_method):
         cnx = get_db()
         epoch_date = time.time() - 18000
         cursor = cnx.cursor(buffered = True)
-        print(int(epoch_date), max_capacity, replacement_method)
         query_add = ''' INSERT INTO cache_properties (epoch_date, max_capacity, replacement_method) VALUES (%s,%s,%s)'''
         cursor.execute(query_add,(epoch_date,max_capacity, replacement_method))
         cnx.commit()
+        # TODO: Reset Memcache through new rest endpoint
         
         return epoch_date
     except:
