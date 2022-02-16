@@ -2,11 +2,15 @@ from flask import render_template, request, send_file, redirect, url_for, g
 from app import webapp
 from app.db_connection import get_db
 from app.image_utils import save_image
-import requests
-import time
-import datetime
+import requests, time, datetime
+from app.cache_utils import *
+import app.config as conf
 
 update_time = time.ctime(time.time())
+
+@webapp.before_first_request
+def set_cache_db_settings():
+    set_cache_params(conf.max_capacity, conf.replacement_policy)
 
 @webapp.teardown_appcontext
 def teardown_db(exception):
@@ -91,10 +95,10 @@ def key_store():
 
 @webapp.route('/memcache_params', methods = ['GET','POST'])
 def memcache_params():
-    # TODO: Add in a DB call to get base values
-    global update_time
-    capacity = "100MB"
-    replacement_policy = "LRU" 
+    cache_params = get_cache_params()
+    update_time = time.ctime(cache_params[1])
+    capacity = cache_params[2]
+    replacement_policy = cache_params[3]
     date = datetime.datetime.strptime(update_time, "%a %b %d %H:%M:%S %Y")
     date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
 
@@ -108,8 +112,8 @@ def memcache_params():
             if not new_cap == "":
                 capacity = new_cap
             replacement_policy = request.form.get('replacement_policy')
-            update_time = time.ctime(time.time())
-            date = datetime.datetime.strptime(update_time, "%a %b %d %H:%M:%S %Y")
+            update_time = set_cache_params(conf.max_capacity, conf.replacement_policy)
+            date = datetime.datetime.strptime(time.ctime(update_time), "%a %b %d %H:%M:%S %Y")
             date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
             return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
     return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)

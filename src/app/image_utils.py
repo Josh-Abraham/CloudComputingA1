@@ -46,6 +46,7 @@ def write_img_db(image_key, image_tag):
         query_add = ''' INSERT INTO image_table (image_key,image_tag) VALUES (%s,%s)'''
         cursor.execute(query_add,(image_key,image_tag))
         cnx.commit()
+        cnx.close()
 
         return "OK"
     except:

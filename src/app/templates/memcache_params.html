@@ -23,22 +23,22 @@
             <label for="replacement_policy" class="label-padding">
                 Select memory cache replacement policy:
             </label>
-            {% if replacement_policy == "LRU" %}
+            {% if replacement_policy == "Least Recently Used" %}
             <div>
-                <input type="radio" id="lru" name="replacement_policy" checked value="lru">
+                <input type="radio" id="lru" name="replacement_policy" checked value="Least Recently Used">
                 <label for="lru">Least Recently Used</label>
             </div>
             <div>
-                <input type="radio" id="random" name="replacement_policy" value="random">
+                <input type="radio" id="random" name="replacement_policy" value="Random Replacement">
                 <label for="random">Random Replacement</label>
             </div>
             {% else %}
             <div>
-                <input type="radio" id="lru" name="replacement_policy" value="lru">
+                <input type="radio" id="lru" name="replacement_policy" value="Least Recently Used">
                 <label for="lru">Least Recently Used</label>
             </div>
             <div>
-                <input type="radio" id="random" name="replacement_policy" checked value="random">
+                <input type="radio" id="random" name="replacement_policy" checked value="Random Replacement">
                 <label for="random">Random Replacement</label>
             </div>
             {% endif %}
