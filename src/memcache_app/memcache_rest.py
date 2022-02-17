@@ -22,7 +22,6 @@ def get():
     if response==None:
         print (response)
         return "Unknown key"
-        #check db and put into memcache
     else:
         print (response)
         return response
@@ -37,6 +36,7 @@ def invalidate():
     req_json = request.get_json(force=True)
     memcache_obj.invalidate(req_json["key"])
     return get_response(True)
+
 
 def get_response(input=False):
     if input:

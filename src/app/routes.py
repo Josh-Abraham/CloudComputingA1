@@ -117,3 +117,58 @@ def memcache_params():
             date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
             return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
     return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
+
+
+error_message={"success":"false" , "error":{"code"}}
+@webapp.route('/api/list_keys', methods = ['POST'])
+def list_keys():
+    try:
+        cnx = get_db()
+        cursor = cnx.cursor()
+        query = "SELECT image_key FROM image_table"
+        cursor.execute(query)
+        keys = [] #will recieve keys from db
+        for key in cursor:
+            keys.append(key[0])
+        cnx.close()
+        data_out={"success":"true" , "keys":keys}
+        return jsonify(data_out)
+    except Exception as e:
+        error_message={"success":"false" , "error":{"code":e.code, "message":e.message}}
+        return(jsonify(error_message))
+
+@webapp.route('/api/key/<key_value>', methods = ['POST'])
+def one_key(key_value):
+    try:
+        #str(request.url_rule).strip().split('/')[-1]
+        jsonReq={"keyReq":key_value}
+        res= requests.post('http://localhost:5001/get', json=jsonReq)
+        if(res.text=='Unknown key'):#res.text is the file path of the image from the memcache
+            #get from db and update memcache
+            cnx = get_db()
+            cursor = cnx.cursor(buffered=True)
+            query = "SELECT image_tag FROM image_table where image_key= %s"
+            cursor.execute(query, (key_value,))
+            if(cursor._rowcount):# if key exists in db
+                image_tag=str(cursor.fetchone()[0]) #cursor[0] is the imagetag recieved from the db
+                #close the db connection
+                cnx.close()
+
+                #put into memcache
+                filename=image_tag
+                jsonReq = {key:filename}
+                res = requests.post('http://localhost:5001/put', json=jsonReq)
+                #output json with db values
+            else:#the key is not found in the db
+                #TODO what should we output if key is not in DB???
+        else:
+            #TODO: the content from memcache in base 64 format.
+
+    except Exception as e:
+        error_message={"success":"false" , "error":{"code":e.code, "message":e.message}}
+        return(jsonify(error_message))
+
+
+@webapp.route('/api/upload', methods = ['POST'])
+def upload():
+
