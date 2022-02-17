@@ -12,7 +12,7 @@ def put():
 @webapp.route('/clear', methods = ['GET', 'POST'])
 def clear():
     memcache_obj.clear_cache()
-    return get_response()
+    return get_response(True)
 
 @webapp.route('/get', methods = ['POST'])
 def get():

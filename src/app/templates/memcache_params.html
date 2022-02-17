@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<head>
+    <title>ECE1779 Assignment One</title>
+    <link rel="stylesheet" href='/static/core-style.css' />
+</head>
+<html>
+    <body>
+        {% include "top_bar.html" %}
+        <h3>Update Memory Cache Configuration</h3>
+        <form 
+            class="form-outline"
+            style="height: 200px; width: 600px"
+            method="post">
+            <label>Memcache Last Configured: <b>{{ update_time }}</b></label><br><br>
+            <label for="capacity">Insert capacity:</label>
+            <input 
+                type="text"
+                id="capacity"
+                name="capacity"
+                value="{{ capacity }}"
+                class="type-select"><br>
+             
+            <label for="replacement_policy" class="label-padding">
+                Select memory cache replacement policy:
+            </label>
+            {% if replacement_policy == "Least Recently Used" %}
+            <div>
+                <input type="radio" id="lru" name="replacement_policy" checked value="Least Recently Used">
+                <label for="lru">Least Recently Used</label>
+            </div>
+            <div>
+                <input type="radio" id="random" name="replacement_policy" value="Random Replacement">
+                <label for="random">Random Replacement</label>
+            </div>
+            {% else %}
+            <div>
+                <input type="radio" id="lru" name="replacement_policy" value="Least Recently Used">
+                <label for="lru">Least Recently Used</label>
+            </div>
+            <div>
+                <input type="radio" id="random" name="replacement_policy" checked value="Random Replacement">
+                <label for="random">Random Replacement</label>
+            </div>
+            {% endif %}
+            <input type="submit" id="submit" class="submit-button" value="Update Configuration">
+        </form>    
+        <form method="post" class="cache-form">
+            <input name="clear_cache" style="visibility: collapse; height: 0px">
+            <input
+                type="submit"
+                id="clear_cache"
+                class="submit-button"
+                style="margin-top: -30px"
+                value="Clear Cache">
+        </form>
+        
+        
+        
+        
+    <body>    
+</html>
