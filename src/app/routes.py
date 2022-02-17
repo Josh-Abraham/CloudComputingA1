@@ -156,13 +156,20 @@ def one_key(key_value):
 
                 #put into memcache
                 filename=image_tag
-                jsonReq = {key:filename}
+                jsonReq = {key_value:filename}
                 res = requests.post('http://localhost:5001/put', json=jsonReq)
                 #output json with db values
             else:#the key is not found in the db
                 #TODO what should we output if key is not in DB???
+
+                data_out={"success":"true" , "content":None}
+                return jsonify(data_out)
+
         else:
             #TODO: the content from memcache in base 64 format.
+
+            data_out={"success":"true" , "content":res.text}
+            return jsonify(data_out)
 
     except Exception as e:
         error_message={"success":"false" , "error":{"code":e.code, "message":e.message}}
@@ -171,4 +178,15 @@ def one_key(key_value):
 
 @webapp.route('/api/upload', methods = ['POST'])
 def upload():
+    try:
+        key=request.form.get('key')
+        file=request.form.get('file')
+        #TODO: add new upload method with base 64
+
+        data_out={"success":"true"}
+        return jsonify(data_out)
+
+    except Exception as e:
+        error_message={"success":"false" , "error":{"code":e.code, "message":e.message}}
+        return(jsonify(error_message))
 
