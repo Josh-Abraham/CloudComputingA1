@@ -19,7 +19,7 @@
                     <h4>Image:</h4>
                     <img src= "{{ url_for('get_image', filename=filename) }}" alt={{filename}}  class="image-preview"/>
                 {% else %}
-                    <h4>Image Not Present</h4>
+                    <h4>THE KEY ENTERED DOES NOT EXIST, PLEASE ENTER VALID KEY</h4>
                 {% endif %}
             {% endif %}
         </div>

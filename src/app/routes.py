@@ -1,4 +1,4 @@
-from flask import render_template, request, send_file, redirect, url_for, g
+from flask import render_template, request, send_file, redirect, url_for, g, jsonify
 from app import webapp
 from app.db_connection import get_db
 from app.image_utils import save_image
@@ -72,11 +72,11 @@ def key_store():
     cursor = cnx.cursor()
     query = "SELECT image_key FROM image_table"
     cursor.execute(query)
-    keys = [] #will recieve keys from either memcache or db
+    keys = [] #will recieve keys from db
     for key in cursor:
         keys.append(key[0])
     total=len(keys)
-    
+
     #close db connection
     cnx.close()
 
