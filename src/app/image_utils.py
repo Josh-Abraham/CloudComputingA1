@@ -1,5 +1,5 @@
 from app import UPLOAD_FOLDER
-import os, requests
+import os, requests, base64
 from app.db_connection import get_db
 
 
@@ -26,6 +26,12 @@ def save_image(request, key):
         return "INVALID"
     except:
         return "INVALID"
+
+def write_image_base64(filename):
+    with open(UPLOAD_FOLDER + "/" + filename, "rb") as img_file:
+        base64_image = base64.b64encode(img_file.read())
+    base64_image = base64_image.decode('utf-8')
+    return base64_image
 
 def write_img_db(image_key, image_tag):
 

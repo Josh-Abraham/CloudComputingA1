@@ -1,12 +1,12 @@
 from flask import render_template, request, send_file, redirect, url_for, g
 from app import webapp
 from app.db_connection import get_db
-from app.image_utils import save_image
+from app.image_utils import save_image, write_image_base64
 import requests, time, datetime
 from app.cache_utils import *
 import app.config as conf
 
-update_time = time.ctime(time.time())
+cache_host = "http://localhost:5001"
 
 @webapp.before_first_request
 def set_cache_db_settings():
@@ -39,10 +39,11 @@ def add_key():
 
 @webapp.route('/show_image', methods = ['GET','POST'])
 def show_image():
+    global cache_host
     if request.method == 'POST':
         key = request.form.get('key')
         jsonReq={"keyReq":key}
-        res= requests.post('http://localhost:5001/get', json=jsonReq)
+        res= requests.post(cache_host + '/get', json=jsonReq)
         if(res.text=='Unknown key'):#res.text is the file path of the image from the memcache
             #get from db and update memcache
             cnx = get_db()
@@ -53,12 +54,12 @@ def show_image():
                 image_tag=str(cursor.fetchone()[0]) #cursor[0] is the imagetag recieved from the db
                 #close the db connection
                 cnx.close()
-
                 #put into memcache
                 filename=image_tag
-                jsonReq = {key:filename}
-                res = requests.post('http://localhost:5001/put', json=jsonReq)
-                return render_template('show_image.html', exists=True, filename=filename)
+                base64_image = write_image_base64(filename)
+                jsonReq = {key:base64_image}
+                res = requests.post(cache_host + '/put', json=jsonReq)
+                return render_template('show_image.html', exists=True, filename=base64_image)
             else:#the key is not found in the db
                 return render_template('show_image.html', exists=False, filename="does not exist")
 
@@ -95,6 +96,7 @@ def key_store():
 
 @webapp.route('/memcache_params', methods = ['GET','POST'])
 def memcache_params():
+    global cache_host
     cache_params = get_cache_params()
     update_time = time.ctime(cache_params[1])
     capacity = cache_params[2]
@@ -103,17 +105,22 @@ def memcache_params():
     date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
 
     if request.method == 'POST':
-        print(request.form)
+        
         if not request.form.get("clear_cache") == None:
-            requests.post('http://localhost:5001/clear')
-            return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
+            requests.post(cache_host + '/clear')
+            return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date, status="CLEAR")
         else:
             new_cap = request.form.get('capacity')
-            if not new_cap == "":
-                capacity = new_cap
-            replacement_policy = request.form.get('replacement_policy')
-            update_time = set_cache_params(conf.max_capacity, conf.replacement_policy)
-            date = datetime.datetime.strptime(time.ctime(update_time), "%a %b %d %H:%M:%S %Y")
-            date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
-            return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
+            if new_cap.isdigit():
+                print("In here")
+                new_policy = request.form.get('replacement_policy')
+                new_time = set_cache_params(new_cap, new_policy)
+                if not new_time == None:
+                    new_time = datetime.datetime.strptime(time.ctime(new_time), "%a %b %d %H:%M:%S %Y")
+                    new_time.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
+                    resp = requests.post(cache_host + '/refreshConfiguration')
+                    if resp.json() == 'OK':
+                        return render_template('memcache_params.html', capacity=new_cap, replacement_policy=new_policy, update_time=new_time, status="FALSE")
+            # On error, reset to old params
+            return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date, status="TRUE")
     return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
