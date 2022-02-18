@@ -2,9 +2,11 @@ from flask import render_template, request, send_file, redirect, url_for, g
 from app import webapp
 from app.db_connection import get_db
 from app.image_utils import save_image, write_image_base64
+from app.plot_utils import *
 import requests, time, datetime
 from app.cache_utils import *
 import app.config as conf
+import datetime
 
 cache_host = "http://localhost:5001"
 
@@ -93,6 +95,26 @@ def key_store():
     else:
         return render_template('key_store.html')
 
+@webapp.route('/cache_stats')
+def cache_stats():
+    cnx = get_db()
+    cursor = cnx.cursor(dictionary=True)
+    stop_time = datetime.datetime.now()
+    start_time = stop_time - datetime.timedelta(minutes=5000) #todo change it to 5 minutes
+    query = '''SELECT * FROM cache_stats cs WHERE cs.created_at > %s and cs.created_at < %s'''
+    cursor.execute(query, (start_time, stop_time))
+    rows = cursor.fetchall()
+    cnx.close()
+    
+    # prepare_dir()
+    (x_data, y_data) = prepare_data(rows)
+    image_map = {}
+    for k,v in y_data.items():
+        image_map[k] = plot_graphs(x_data['x-axis'], v)
+
+    return render_template('cache_stats.html', cache_count_plot = image_map['cache_count'], 
+                            request_plot = image_map['request_count'], cache_size_plot = image_map['cache_size'], 
+                             hit_plot = image_map['hit'], miss_plot = image_map['miss'])
 
 @webapp.route('/memcache_params', methods = ['GET','POST'])
 def memcache_params():
