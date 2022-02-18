@@ -22,7 +22,6 @@ def set_cache_params(max_capacity, replacement_method):
         query_add = ''' INSERT INTO cache_properties (epoch_date, max_capacity, replacement_method) VALUES (%s,%s,%s)'''
         cursor.execute(query_add,(epoch_date,max_capacity, replacement_method))
         cnx.commit()
-
         return epoch_date
     except:
         return None

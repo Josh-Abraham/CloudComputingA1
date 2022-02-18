@@ -24,12 +24,13 @@ def prepare_data(rows):
         y_data['cache_count'].append(row['key_count'])
     return (x_data, y_data)
 
-def plot_graphs(data_x_axis, data_y_axis):
+def plot_graphs(data_x_axis, data_y_axis, y_label):
     print("plot graph started")
     # Generate the figure **without using pyplot**.
     fig = Figure(tight_layout=True)
     ax = fig.subplots()
     ax.plot(data_x_axis, data_y_axis)
+    ax.set(xlabel='Date-Time', ylabel=y_label)
     # Save it to a temporary buffer.
     buf = BytesIO()
     fig.savefig(buf, format="png")

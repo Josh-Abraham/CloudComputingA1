@@ -39,24 +39,18 @@ def invalidate():
     memcache_obj.invalidate(req_json["key"])
     return get_response(True)
 
-@webapp.route('/cache_stats', methods = ['GET'])
-def cache_stats():
-    print("print cache12345")
-
-@webapp.route('/set_cache_stats', methods = ['GET'])
+@webapp.route('/set_cache_stats', methods = ['POST'])
 def set_cache_stats():
-    print("cache stats")
     cnx = get_db()
     cursor = cnx.cursor(buffered = True)
-    cache_params = get_cache_params()
-    if not cache_params == None:
-        cache_property_id = cache_params[0]
-        query_add = '''INSERT INTO cache_stats ( cache_property_id, cache_size, key_count, request_count, miss_count) VALUES (%s,%s,%s,%s,%s)'''
-        print("query_add is: ", query_add)
-        print("memcache is: ", memcache_obj.hit)
-        cursor.execute(query_add, (cache_property_id, memcache_obj.current_size, memcache_obj.access_count, memcache_obj.hit + memcache_obj.miss, memcache_obj.miss))
-        cnx.commit()
-        cnx.close()
+    query_add = '''INSERT INTO cache_stats (cache_size, key_count, 
+                    request_count, miss_count) VALUES (%s,%s,%s,%s)'''
+    cursor.execute(query_add, (memcache_obj.current_size, 
+                    memcache_obj.access_count, memcache_obj.hit + memcache_obj.miss, memcache_obj.miss))
+    cnx.commit()
+    cnx.close()
+    return get_response(True)
+
 
 @webapp.route('/refreshConfiguration', methods = ['POST'])
 def refresh_configs():
@@ -88,15 +82,6 @@ def get_response_no_key():
     response = webapp.response_class(
         response=json.dumps("Unknown key"),
         status=400,
-        mimetype='application/json'
-    )
-
-    return response
-
-def put_response():
-    response = webapp.response_class(
-        response=json.dumps("OK"),
-        status=200,
         mimetype='application/json'
     )
 

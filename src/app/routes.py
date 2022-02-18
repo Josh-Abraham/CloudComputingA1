@@ -100,7 +100,7 @@ def cache_stats():
     cnx = get_db()
     cursor = cnx.cursor(dictionary=True)
     stop_time = datetime.datetime.now()
-    start_time = stop_time - datetime.timedelta(minutes=5000) #todo change it to 5 minutes
+    start_time = stop_time - datetime.timedelta(minutes=10)
     query = '''SELECT * FROM cache_stats cs WHERE cs.created_at > %s and cs.created_at < %s'''
     cursor.execute(query, (start_time, stop_time))
     rows = cursor.fetchall()
@@ -110,7 +110,7 @@ def cache_stats():
     (x_data, y_data) = prepare_data(rows)
     image_map = {}
     for k,v in y_data.items():
-        image_map[k] = plot_graphs(x_data['x-axis'], v)
+        image_map[k] = plot_graphs(x_data['x-axis'], v, k)
 
     return render_template('cache_stats.html', cache_count_plot = image_map['cache_count'], 
                             request_plot = image_map['request_count'], cache_size_plot = image_map['cache_size'], 
