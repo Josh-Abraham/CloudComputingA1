@@ -6,31 +6,42 @@ import requests, time, datetime
 from app.cache_utils import *
 import app.config as conf
 
+# Memcache host port
 cache_host = "http://localhost:5001"
 
 @webapp.before_first_request
 def set_cache_db_settings():
+    """ Set cache settings on project mount
+    """
     set_cache_params(conf.max_capacity, conf.replacement_policy)
 
 @webapp.teardown_appcontext
 def teardown_db(exception):
+    """ Tear down database connect when shutting down
+    """
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
-@webapp.teardown_appcontext
-def teardown_db(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
+@webapp.errorhandler(404)
+def not_found(e):
+    """ Error template goes back to home
+    """
+    return render_template("home.html")
 
 @webapp.route('/')
 @webapp.route('/home')
 def home():
+    """ Main route, as well as default location for 404s
+    """
     return render_template("home.html")
 
 @webapp.route('/add_key', methods = ['GET','POST'])
 def add_key():
+    """Add an image
+    GET: Simply render the add_key page
+    POST: Pass in key from form to add to DB and file system
+    """
     if request.method == 'POST':
         key = request.form.get('key')
         status = save_image(request, key)
@@ -39,6 +50,13 @@ def add_key():
 
 @webapp.route('/show_image', methods = ['GET','POST'])
 def show_image():
+    """ Endpoint to show the image 
+    GET: Simply render the show_image page
+    POST: Post request will check memcache first
+    If it exists in cache, fetch it
+    If doesn't exist, fetch file location from DB, and add to cache
+    Display image as Base64
+    """
     global cache_host
     if request.method == 'POST':
         key = request.form.get('key')
@@ -68,14 +86,19 @@ def show_image():
             return render_template('show_image.html', exists=True, filename=res.text)
     return render_template('show_image.html')
 
-# this endpoint just returns the image. The key is the filename with extension
+
 @webapp.route("/get_image/<filename>")
 def get_image(filename):
+    """ This endpoint just returns the image
+    The key is the filename with extension
+    """
     filepath = "static/images/" + filename
     return send_file(filepath)
 
 @webapp.route('/key_store')
 def key_store():
+    """ Get list of all keys currently in the database
+    """
     cnx = get_db()
     cursor = cnx.cursor()
     query = "SELECT image_key FROM image_table"
@@ -96,23 +119,37 @@ def key_store():
 
 @webapp.route('/memcache_params', methods = ['GET','POST'])
 def memcache_params():
+    """ Memcache Paremeters has 3 unique functionailities depending on case
+    GET: Fetch the database configurations for the memcache
+    POST: Clear button hit will clear the cache
+    POST: Set new parameters, pass them into the database and format for the UI
+    """
     global cache_host
     cache_params = get_cache_params()
-    update_time = time.ctime(cache_params[1])
-    capacity = cache_params[2]
-    replacement_policy = cache_params[3]
+    if not cache_params == None:
+        update_time = time.ctime(cache_params[1])
+        capacity = cache_params[2]
+        replacement_policy = cache_params[3]
+    else:
+        # Error catchign case, will set to 0 values so it startups gracefully
+        update_time = time.ctime(time.time())
+        capacity = 0
+        replacement_policy = "Least Recently Used"
+
+    # Go from Epoch time to formatted date-time object
     date = datetime.datetime.strptime(update_time, "%a %b %d %H:%M:%S %Y")
     date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
-
+    
     if request.method == 'POST':
         
         if not request.form.get("clear_cache") == None:
+            # Clear button is hit, will clear the current cache
             requests.post(cache_host + '/clear')
             return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date, status="CLEAR")
         else:
+            # Check new cache paramters
             new_cap = request.form.get('capacity')
             if new_cap.isdigit():
-                print("In here")
                 new_policy = request.form.get('replacement_policy')
                 new_time = set_cache_params(new_cap, new_policy)
                 if not new_time == None:
@@ -121,6 +158,6 @@ def memcache_params():
                     resp = requests.post(cache_host + '/refreshConfiguration')
                     if resp.json() == 'OK':
                         return render_template('memcache_params.html', capacity=new_cap, replacement_policy=new_policy, update_time=new_time, status="FALSE")
-            # On error, reset to old params
+            # On error, reset to old params. Not set in the DB, so only a UI refresh is needed
             return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date, status="TRUE")
     return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
