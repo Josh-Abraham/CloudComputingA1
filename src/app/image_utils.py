@@ -6,7 +6,7 @@ from app.db_connection import get_db
 def save_image(request, key):
     img_url = request.form.get('img_url')
     if img_url == "":
-        file = request.files['img_file']
+        file = request.files['file']
         _, extension = os.path.splitext(file.filename)
         filename = key + extension
         file.save(os.path.join(UPLOAD_FOLDER, filename))

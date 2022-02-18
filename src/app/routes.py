@@ -187,9 +187,11 @@ def one_key(key_value):
 @webapp.route('/api/upload', methods = ['POST'])
 def upload():
     try:
-        key=request.form.get('key')
-        file=request.form.get('file')
-        #TODO: add new upload method with base 64
+        key = request.form.get('key')
+        status = save_image(request, key)
+        if status=="INVALID" or status== "FAILURE":
+            data_out={"success":"false" , "error":{"code": "500 Internal Server Error", "message":"Failed to upload image"}}
+            return jsonify(data_out)
 
         data_out={"success":"true"}
         return jsonify(data_out)
