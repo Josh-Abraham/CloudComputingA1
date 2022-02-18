@@ -105,7 +105,7 @@ def memcache_params():
     date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
 
     if request.method == 'POST':
-        
+
         if not request.form.get("clear_cache") == None:
             requests.post(cache_host + '/clear')
             return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date, status="CLEAR")
@@ -163,18 +163,19 @@ def one_key(key_value):
 
                 #put into memcache
                 filename=image_tag
-                jsonReq = {key_value:filename}
-                res = requests.post('http://localhost:5001/put', json=jsonReq)
+                base64_image = write_image_base64(filename)
+                jsonReq = {key:base64_image}
+                res = requests.post(cache_host + '/put', json=jsonReq)
+                data_out={"success":"true" , "content":base64_image}
+                return jsonify(data_out)
                 #output json with db values
             else:#the key is not found in the db
                 #TODO what should we output if key is not in DB???
 
-                data_out={"success":"true" , "content":None}
+                data_out={"success":"false" , "error":{"code": "406 Not Acceptable", "message":"specified key does not not exist"}}
                 return jsonify(data_out)
 
         else:
-            #TODO: the content from memcache in base 64 format.
-
             data_out={"success":"true" , "content":res.text}
             return jsonify(data_out)
 
