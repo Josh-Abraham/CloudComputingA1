@@ -1,4 +1,5 @@
 from memcache_app import memcache_obj, webapp
+from app.cache_utils import get_cache_params
 from flask import request
 import json
 
@@ -7,7 +8,7 @@ def put():
     req_json = request.get_json(force=True)
     key, value = list(req_json.items())[0]
     memcache_obj.pushitem(key, value)
-    return get_response()
+    return get_response(True)
 
 @webapp.route('/clear', methods = ['GET', 'POST'])
 def clear():
@@ -20,11 +21,9 @@ def get():
     key = req_json["keyReq"]
     response=memcache_obj.getitem(key)
     if response==None:
-        print (response)
         return "Unknown key"
         #check db and put into memcache
     else:
-        print (response)
         return response
 
 @webapp.route('/test/<key>/<value>')
@@ -37,6 +36,16 @@ def invalidate():
     req_json = request.get_json(force=True)
     memcache_obj.invalidate(req_json["key"])
     return get_response(True)
+
+@webapp.route('/refreshConfiguration', methods = ['POST'])
+def refresh_configs():
+    cache_params = get_cache_params()
+    if not cache_params == None:
+        capacity = cache_params[2]
+        replacement_policy = cache_params[3]
+        memcache_obj.refreshConfiguration(capacity, replacement_policy)
+        return get_response(True)
+    return None
 
 def get_response(input=False):
     if input:

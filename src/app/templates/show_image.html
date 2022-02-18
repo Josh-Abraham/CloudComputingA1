@@ -17,7 +17,7 @@
             {% if filename is defined %}
                 {% if exists %}
                     <h4>Image:</h4>
-                    <img src= "{{ url_for('get_image', filename=filename) }}" alt={{filename}}  class="image-preview"/>
+                    <img src= "data:image/png;base64,{{ filename }}" alt={{filename}}  class="image-preview"/>
                 {% else %}
                     <h4>Image Not Present</h4>
                 {% endif %}
