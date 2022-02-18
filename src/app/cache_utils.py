@@ -12,7 +12,7 @@ def get_cache_params():
             return cache_params
         return None
     except:
-        return "ERROR"
+        return None
 
 def set_cache_params(max_capacity, replacement_method):
     try:
@@ -22,8 +22,7 @@ def set_cache_params(max_capacity, replacement_method):
         query_add = ''' INSERT INTO cache_properties (epoch_date, max_capacity, replacement_method) VALUES (%s,%s,%s)'''
         cursor.execute(query_add,(epoch_date,max_capacity, replacement_method))
         cnx.commit()
-        # TODO: Reset Memcache through new rest endpoint
         
         return epoch_date
     except:
-        return "FAILURE"
+        return None

@@ -71,6 +71,11 @@ def get_cache(cache):
                 while self.currsize > 0:
                     self.popitem()
 
+        def refreshConfiguration(self, size, replacement_policy):
+            self.replace_policy = replacement_policy
+            self.__copy__(size)
+            return "OK"
+
         def __copy__(self, size):
             if (self.replace_policy == constants.LRU):
                 base_cache = get_cache(LRUCache)
@@ -85,7 +90,6 @@ def get_cache(cache):
             data = self._Cache__data
             for key,value in data.items():
                 new_memcache.pushitem(key, value)
-            print(new_memcache)
             return new_memcache
 
         def __missing__(self, key): #[todo] what else can be returned?
