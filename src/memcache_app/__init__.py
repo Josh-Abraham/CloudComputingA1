@@ -17,7 +17,9 @@ import time
 import mysql.connector
 from datetime import datetime
 
-def background_job(db_config):
+lock = threading.Lock()
+
+def background_job(db_config, memcache_obj):
     print("Background Job Start")
 
     while True:
@@ -26,8 +28,8 @@ def background_job(db_config):
         cnx = mysql.connector.connect(user=db_config['user'], password=db_config['password'], host=db_config['host'], database=db_config['database'])
         cnx.autocommit = False
         cursor = cnx.cursor(buffered=True)
-
-        if not threading.currentThread().isDaemon():
+        
+        with lock:
             cursor.execute(query_add, (datetime.now(),memcache_obj.current_size, memcache_obj.access_count, memcache_obj.hit + memcache_obj.miss, memcache_obj.miss))
             cnx.commit()
         
@@ -38,4 +40,4 @@ def background_job(db_config):
     print("Exit Background Job")
     return "success" 
 
-threading.Thread(target=background_job, args= (db_config,)).start()
+threading.Thread(target=background_job, args= (db_config,memcache_obj)).start()
