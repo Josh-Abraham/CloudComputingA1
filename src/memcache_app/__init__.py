@@ -13,31 +13,34 @@ memcache_obj = base_cache(2)
 
 from memcache_app import memcache_rest
 import threading
-import time
 import mysql.connector
 from datetime import datetime
-
+event = threading.Event()
 lock = threading.Lock()
 
 def background_job(db_config, memcache_obj):
     print("Background Job Start")
 
     while True:
-        time.sleep(5)
-        query_add = '''INSERT INTO cache_stats (created_at, cache_size, key_count, request_count, miss_count) VALUES (%s,%s,%s,%s,%s)'''
-        cnx = mysql.connector.connect(user=db_config['user'], password=db_config['password'], host=db_config['host'], database=db_config['database'])
+        event.wait(5)
+        query_add = '''INSERT INTO cache_stats (created_at, cache_size, key_count, 
+                            request_count, miss_count) VALUES (%s,%s,%s,%s,%s)'''
+        cnx = mysql.connector.connect(user=db_config['user'], password=db_config['password'], 
+                                        host=db_config['host'], database=db_config['database'])
         cnx.autocommit = False
         cursor = cnx.cursor(buffered=True)
         
         with lock:
-            cursor.execute(query_add, (datetime.now(),memcache_obj.current_size, memcache_obj.access_count, memcache_obj.hit + memcache_obj.miss, memcache_obj.miss))
-            cnx.commit()
-        
+            if threading.active_count() > 2 :
+                cursor.execute(query_add, (datetime.now(),memcache_obj.current_size, memcache_obj.currsize, 
+                                memcache_obj.access_count, memcache_obj.miss))
+                cnx.commit()
+                print("DB Write Done: -> active_count is :", threading.active_count())
+                print("Thread native_id is: ", threading.get_native_id())
         cnx.close()
-        print("Inside background job - threadname: ", threading.currentThread())
-        print(threading.enumerate())
         
     print("Exit Background Job")
     return "success" 
 
+print("main thread: native_id:", threading.get_native_id())
 threading.Thread(target=background_job, args= (db_config,memcache_obj)).start()
