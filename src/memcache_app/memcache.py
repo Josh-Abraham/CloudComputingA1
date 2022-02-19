@@ -57,7 +57,6 @@ def get_cache(cache):
             return response
 
         def invalidate(self, key):
-            #TODO: Does Invalidate increment access count?
             response = self.__getitem__(key)
             if(response != None):
                 (_, value) = response

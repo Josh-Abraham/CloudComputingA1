@@ -7,6 +7,14 @@ import time
 
 @webapp.route('/put', methods = ['POST'])
 def put():
+    """ Put request to add key to memecache
+
+        Parameters:
+            request (Request): key and base64 image
+
+        Return:
+            response (JSON): "OK" or "ERROR"
+    """
     req_json = request.get_json(force=True)
     key, value = list(req_json.items())[0]
     memcache_obj.pushitem(key, value)
@@ -14,11 +22,24 @@ def put():
 
 @webapp.route('/clear', methods = ['GET', 'POST'])
 def clear():
+    """ Clear cache values
+
+        Return:
+            response (JSON): "OK"
+    """
     memcache_obj.clear_cache()
     return get_response(True)
 
 @webapp.route('/get', methods = ['POST'])
 def get():
+    """ Get key from cache
+
+        Parameters:
+            request (Request): key
+
+        Return:
+            response: "OK" or "Unknown Key"
+    """
     req_json = request.get_json(force=True)
     key = req_json["keyReq"]
     response=memcache_obj.getitem(key)
@@ -35,12 +56,28 @@ def test(key,value):
 
 @webapp.route('/invalidate', methods = ['POST'])
 def invalidate():
+    """ Invalidate key in cache
+
+        Parameters:
+            request (Request): key
+
+        Return:
+            response (JSON): "OK"
+    """
     req_json = request.get_json(force=True)
     memcache_obj.invalidate(req_json["key"])
     return get_response(True)
 
 @webapp.route('/refreshConfiguration', methods = ['POST'])
 def refresh_configs():
+    """ Refresh configuration with new parameters
+
+        Parameters:
+            request (Request): Capacity and replacement policy
+
+        Return:
+            response (JSON): "OK"
+    """
     cache_params = get_cache_params()
     if not cache_params == None:
         capacity = cache_params[2]
