@@ -7,7 +7,7 @@
     <body>
         {% include "top_bar.html" %}
         <h3>Upload Key-Image Pair</h3>
-        <form 
+        <form
             class="form-outline"
             style="height: 260px"
             method="post"
@@ -16,7 +16,7 @@
 
             <label for="key">Insert key:</label><br>
             <input type="text" id="key" name="key" class="type-select">
-            
+
             <br><br>
 
             <label for="img_url">Insert image URL or upload a file:</label><br>
@@ -24,7 +24,7 @@
                 <input type="radio" id="url" name="drone" value="url" checked onclick="showURL()">
                 <label for="url">Insert URL</label>
               </div>
-              
+
               <div>
                 <input type="radio" id="upload" name="drone" value="upload" onclick="showFile()">
                 <label for="upload">Upload File</label>
@@ -35,7 +35,7 @@
                     <input type="text" id="img_url" name="img_url" class="type-select">
                 </div>
                 <div id="img_file_wrapper" style=" visibility: hidden; height:0px">
-                    <input type="file" id="img_file" accept="image/*" name="img_file" style=" margin-top:10px"/> 
+                    <input type="file" id="img_file" accept="image/*" name="file" style=" margin-top:10px"/>
                 </div>
             </div>
 
@@ -52,8 +52,8 @@
                     {% endif %}
                 {% endif %}
             </div>
-        </form>    
-    
+        </form>
+
         <script>
             function validateForm() {
                 image_exists = document.getElementById("img_url").value !== "" || document.getElementById("img_file").value !== "";
@@ -62,16 +62,16 @@
             }
 
             function showURL() {
-                document.getElementById("img_url_wrapper").style.visibility="visible";  
+                document.getElementById("img_url_wrapper").style.visibility="visible";
                 document.getElementById("img_file_wrapper").style.visibility="hidden";
-                document.getElementById("img_file").value = "";  
+                document.getElementById("img_file").value = "";
             }
 
             function showFile() {
-                document.getElementById("img_url_wrapper").style.visibility="hidden"; 
-                document.getElementById("img_url").value = ""; 
-                document.getElementById("img_file_wrapper").style.visibility="visible";  
+                document.getElementById("img_url_wrapper").style.visibility="hidden";
+                document.getElementById("img_url").value = "";
+                document.getElementById("img_file_wrapper").style.visibility="visible";
             }
         </script>
-    <body>    
+    <body>
 </html>
