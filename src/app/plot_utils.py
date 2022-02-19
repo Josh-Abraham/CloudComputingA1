@@ -33,6 +33,7 @@ def plot_graphs(data_x_axis, data_y_axis, y_label):
     ax.set(xlabel='Date-Time', ylabel=y_label)
     # Save it to a temporary buffer.
     buf = BytesIO()
+    fig.autofmt_xdate()
     fig.savefig(buf, format="png")
     # Embed the result in the html output.
     data = base64.b64encode(buf.getbuffer()).decode("ascii")

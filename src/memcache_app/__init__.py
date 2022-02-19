@@ -19,11 +19,6 @@ from datetime import datetime
 
 def background_job(db_config):
     print("Background Job Start")
-    
-    # db_config = {'user': 'root', 
-    #             'password': 'ece1779pass',
-    #             'host': '127.0.0.1',
-    #             'database': 'ImageStore'}
 
     while True:
         time.sleep(5)
