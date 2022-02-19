@@ -39,19 +39,6 @@ def invalidate():
     memcache_obj.invalidate(req_json["key"])
     return get_response(True)
 
-@webapp.route('/set_cache_stats', methods = ['POST'])
-def set_cache_stats():
-    cnx = get_db()
-    cursor = cnx.cursor(buffered = True)
-    query_add = '''INSERT INTO cache_stats (cache_size, key_count, 
-                    request_count, miss_count) VALUES (%s,%s,%s,%s)'''
-    cursor.execute(query_add, (memcache_obj.current_size, 
-                    memcache_obj.access_count, memcache_obj.hit + memcache_obj.miss, memcache_obj.miss))
-    cnx.commit()
-    cnx.close()
-    return get_response(True)
-
-
 @webapp.route('/refreshConfiguration', methods = ['POST'])
 def refresh_configs():
     cache_params = get_cache_params()
