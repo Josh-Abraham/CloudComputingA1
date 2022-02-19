@@ -66,7 +66,7 @@ def show_image():
                 return render_template('show_image.html', exists=False, filename="does not exist")
 
         else:# the key was found in memcache
-            print("memcache response is:", res.text)
+            # print("memcache response is:", res.text)
             return render_template('show_image.html', exists=True, filename=res.text)
     return render_template('show_image.html')
 
@@ -106,7 +106,6 @@ def cache_stats():
     rows = cursor.fetchall()
     cnx.close()
     
-    # prepare_dir()
     (x_data, y_data) = prepare_data(rows)
     image_map = {}
     for k,v in y_data.items():

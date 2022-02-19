@@ -1,15 +1,6 @@
 import base64
 from io import BytesIO
 from matplotlib.figure import Figure
-import os
- 
-def prepare_dir():
-    dir = 'static/images/plots'
-    if os.path.isdir(dir):
-        for f in os.listdir(dir):
-            os.remove(os.path.join(dir, f))
-    else:
-        os.makedirs(dir)
 
 def prepare_data(rows):
     x_data = {'x-axis': [] }
