@@ -2,7 +2,7 @@ from app import UPLOAD_FOLDER
 import os, requests, base64
 from app.db_connection import get_db
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg'}
 
 def save_image(request, key):
     """ Save the image into local storage, calls write_to_db, and invalidates
@@ -19,6 +19,7 @@ def save_image(request, key):
     if img_url == "":
         file = request.files['img_file']
         _, extension = os.path.splitext(file.filename)
+        
         if extension in ALLOWED_EXTENSIONS:
             filename = key + extension
             file.save(os.path.join(UPLOAD_FOLDER, filename))
@@ -30,14 +31,13 @@ def save_image(request, key):
         response = requests.get(img_url)
         if response.status_code == 200:
             _, extension = os.path.splitext(img_url)
+            filename = key + extension
             if extension in ALLOWED_EXTENSIONS:
-                filename = key + extension
                 with open(UPLOAD_FOLDER + "/" + filename, 'wb') as f:
                     f.write(response.content)
                 jsonReq = {"key":key}
                 res = requests.post('http://localhost:5001/invalidate', json=jsonReq)
                 return write_img_db(key, filename)
-            return "INVALID"
         return "INVALID"
     except:
         return "INVALID"
