@@ -1,10 +1,11 @@
 from flask import render_template, request, send_file, redirect, url_for, g, jsonify
 from app import webapp
 from app.db_connection import get_db
-from app.image_utils import save_image, write_image_base64
+from app.image_utils import save_image, write_image_base64,save_image_automated
 import requests, time, datetime
 from app.cache_utils import *
 import app.config as conf
+import json
 
 cache_host = "http://localhost:5001"
 
@@ -126,7 +127,7 @@ def memcache_params():
     return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
 
 
-error_message={"success":"false" , "error":{"code"}}
+
 @webapp.route('/api/list_keys', methods = ['POST'])
 def list_keys():
     try:
@@ -141,10 +142,10 @@ def list_keys():
         data_out={"success":"true" , "keys":keys}
         return jsonify(data_out)
     except Exception as e:
-        error_message={"success":"false" , "error":{"code":e.code, "message":e.message}}
+        error_message={"success":"false" , "error":{"code":"500 Internal Server Error", "message":"Something Went Wrong"}}
         return(jsonify(error_message))
 
-@webapp.route('/api/key/<key_value>', methods = ['POST'])
+@webapp.route('/api/key/<string:key_value>', methods = ['POST'])
 def one_key(key_value):
     try:
         #str(request.url_rule).strip().split('/')[-1]
@@ -164,7 +165,7 @@ def one_key(key_value):
                 #put into memcache
                 filename=image_tag
                 base64_image = write_image_base64(filename)
-                jsonReq = {key:base64_image}
+                jsonReq = {key_value:base64_image}
                 res = requests.post(cache_host + '/put', json=jsonReq)
                 data_out={"success":"true" , "content":base64_image}
                 return jsonify(data_out)
@@ -180,7 +181,7 @@ def one_key(key_value):
             return jsonify(data_out)
 
     except Exception as e:
-        error_message={"success":"false" , "error":{"code":e.code, "message":e.message}}
+        error_message={"success":"false" , "error":{"code":"500 Internal Server Error", "message":"Something Went Wrong"}}
         return(jsonify(error_message))
 
 
@@ -188,7 +189,8 @@ def one_key(key_value):
 def upload():
     try:
         key = request.form.get('key')
-        status = save_image(request, key)
+        status = save_image_automated(request, key)
+        #TODO: add the file handling in the new function
         if status=="INVALID" or status== "FAILURE":
             data_out={"success":"false" , "error":{"code": "500 Internal Server Error", "message":"Failed to upload image"}}
             return jsonify(data_out)
@@ -197,6 +199,27 @@ def upload():
         return jsonify(data_out)
 
     except Exception as e:
-        error_message={"success":"false" , "error":{"code":e.code, "message":e.message}}
+        error_message={"success":"false" , "error":{"code":"500 Internal Server Error", "message":"Something Went Wrong"}}
         return(jsonify(error_message))
+
+
+
+@webapp.route('/test1', methods = ['GET','POST'])
+def test1():
+    res=requests.post("http://localhost:5000" + '/api/list_keys')
+    return (res.text)
+
+@webapp.route('/test2/<key_value>', methods = ['GET','POST'])
+def test2(key_value):
+    res=requests.post("http://localhost:5000" + '/api/key/'+str(key_value))
+    return (res.text)
+
+@webapp.route('/test3', methods = ['GET','POST'])
+def test3():
+    if request.method == 'POST':
+        key = request.form.get('key')
+        f=request.files['file']
+        res=requests.post("http://localhost:5000" + '/api/upload',data={'key':key},files={'file':f})
+        return (res.text)
+    return render_template("add_key.html")
 

@@ -57,3 +57,16 @@ def write_img_db(image_key, image_tag):
         return "OK"
     except:
         return "FAILURE"
+
+def save_image_automated(request, key):
+    try:
+        file = request.files['file']
+        _, extension = os.path.splitext(file.filename)
+        filename = key + extension
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
+        jsonReq = {"key":key}
+        res = requests.post('http://localhost:5001/invalidate', json=jsonReq)
+        return write_img_db(key, filename)
+
+    except:
+        return "INVALID"
