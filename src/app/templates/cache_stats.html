@@ -18,7 +18,7 @@
             <br>
             
             {% if cache_size_plot is defined %}
-                <h4>Statistics on Cache Size:</h4>
+                <h4>Statistics on Cache Size(In Bytes):</h4>
                 <img src= "data:image/png;base64, {{cache_size_plot}}" alt={{cache_size_plot}}  class="image-preview"/>
             {% else %}
                 <h4>Statistics on Cache Size not available</h4>
