@@ -51,7 +51,7 @@ def add_key():
 
 @webapp.route('/show_image', methods = ['GET','POST'])
 def show_image():
-    """ Endpoint to show the image 
+    """ Endpoint to show the image
     GET: Simply render the show_image page
     POST: Post request will check memcache first
     If it exists in cache, fetch it
@@ -140,7 +140,7 @@ def memcache_params():
     # Go from Epoch time to formatted date-time object
     date = datetime.datetime.strptime(update_time, "%a %b %d %H:%M:%S %Y")
     date.strftime("YYYY/MM/DD HH:mm:ss (%Y%m%d %H:%M:%S)")
-    
+
     if request.method == 'POST':
 
         if not request.form.get("clear_cache") == None:
@@ -167,6 +167,12 @@ def memcache_params():
 
 @webapp.route('/api/list_keys', methods = ['POST'])
 def list_keys():
+    """
+    Automatic test endpoint to list all keys currently in the database
+
+    Return: in case of success json with success status and list of keys
+            in case of failure json with success status and the error
+    """
     try:
         cnx = get_db()
         cursor = cnx.cursor()
@@ -178,12 +184,23 @@ def list_keys():
         cnx.close()
         data_out={"success":"true" , "keys":keys}
         return jsonify(data_out)
+
     except Exception as e:
         error_message={"success":"false" , "error":{"code":"500 Internal Server Error", "message":"Something Went Wrong"}}
         return(jsonify(error_message))
 
 @webapp.route('/api/key/<string:key_value>', methods = ['POST'])
 def one_key(key_value):
+    """
+    Automatic test endpoint to retrieve the image associated with the given key
+    Post request will check memcache first
+    If it exists in cache, fetch it
+    If doesn't exist, fetch file location from DB, and add to cache
+    convert image file to Base64
+
+    Return: in case of success json with success status and contents of the image in Base64 format
+            in case of failure json with success status and the error
+    """
     try:
         #str(request.url_rule).strip().split('/')[-1]
         jsonReq={"keyReq":key_value}
@@ -224,11 +241,21 @@ def one_key(key_value):
 
 @webapp.route('/api/upload', methods = ['POST'])
 def upload():
+    """
+    Automatic test endpoint to upload the given key image pair in the Database
+    store the image in the local storage
+    invalidate the key and image in the memcache
+
+    Return: in case of success json with success status
+            in case of failure json with success status and the error
+    """
     try:
         key = request.form.get('key')
         status = save_image_automated(request, key)
         #TODO: add the file handling in the new function
+        print(status)
         if status=="INVALID" or status== "FAILURE":
+            print("fail")
             data_out={"success":"false" , "error":{"code": "500 Internal Server Error", "message":"Failed to upload image"}}
             return jsonify(data_out)
 
@@ -236,6 +263,7 @@ def upload():
         return jsonify(data_out)
 
     except Exception as e:
+        print("exception")
         error_message={"success":"false" , "error":{"code":"500 Internal Server Error", "message":"Something Went Wrong"}}
         return(jsonify(error_message))
 
