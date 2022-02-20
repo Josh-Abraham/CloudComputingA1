@@ -104,7 +104,8 @@ def key_store():
     cursor = cnx.cursor()
     query = "SELECT image_key FROM image_table"
     cursor.execute(query)
-    keys = [] #will recieve keys from db
+    keys = []
+    #make list of all keys in Database
     for key in cursor:
         keys.append(key[0])
     total=len(keys)
@@ -178,7 +179,8 @@ def list_keys():
         cursor = cnx.cursor()
         query = "SELECT image_key FROM image_table"
         cursor.execute(query)
-        keys = [] #will recieve keys from db
+        keys = []
+        #make list of all keys in Database
         for key in cursor:
             keys.append(key[0])
         cnx.close()
@@ -202,7 +204,6 @@ def one_key(key_value):
             in case of failure json with success status and the error
     """
     try:
-        #str(request.url_rule).strip().split('/')[-1]
         jsonReq={"keyReq":key_value}
         res= requests.post('http://localhost:5001/get', json=jsonReq)
         if(res.text=='Unknown key'):#res.text is the file path of the image from the memcache
@@ -215,18 +216,16 @@ def one_key(key_value):
                 image_tag=str(cursor.fetchone()[0]) #cursor[0] is the imagetag recieved from the db
                 #close the db connection
                 cnx.close()
-
                 #put into memcache
                 filename=image_tag
                 base64_image = write_image_base64(filename)
                 jsonReq = {key_value:base64_image}
                 res = requests.post(cache_host + '/put', json=jsonReq)
                 data_out={"success":"true" , "content":base64_image}
-                return jsonify(data_out)
                 #output json with db values
-            else:#the key is not found in the db
-                #TODO what should we output if key is not in DB???
+                return jsonify(data_out)
 
+            else:#the key is not found in the db
                 data_out={"success":"false" , "error":{"code": "406 Not Acceptable", "message":"specified key does not not exist"}}
                 return jsonify(data_out)
 
@@ -252,10 +251,7 @@ def upload():
     try:
         key = request.form.get('key')
         status = save_image_automated(request, key)
-        #TODO: add the file handling in the new function
-        print(status)
         if status=="INVALID" or status== "FAILURE":
-            print("fail")
             data_out={"success":"false" , "error":{"code": "500 Internal Server Error", "message":"Failed to upload image"}}
             return jsonify(data_out)
 
@@ -263,28 +259,7 @@ def upload():
         return jsonify(data_out)
 
     except Exception as e:
-        print("exception")
         error_message={"success":"false" , "error":{"code":"500 Internal Server Error", "message":"Something Went Wrong"}}
         return(jsonify(error_message))
 
-
-
-@webapp.route('/test1', methods = ['GET','POST'])
-def test1():
-    res=requests.post("http://localhost:5000" + '/api/list_keys')
-    return (res.text)
-
-@webapp.route('/test2/<key_value>', methods = ['GET','POST'])
-def test2(key_value):
-    res=requests.post("http://localhost:5000" + '/api/key/'+str(key_value))
-    return (res.text)
-
-@webapp.route('/test3', methods = ['GET','POST'])
-def test3():
-    if request.method == 'POST':
-        key = request.form.get('key')
-        f=request.files['file']
-        res=requests.post("http://localhost:5000" + '/api/upload',data={'key':key},files={'file':f})
-        return (res.text)
-    return render_template("add_key.html")
 
