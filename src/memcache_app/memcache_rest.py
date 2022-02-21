@@ -79,10 +79,14 @@ def refresh_configs():
             response (JSON): "OK"
     """
     cache_params = get_cache_params()
+    print("pre if")
     if not cache_params == None:
+        print("Got cache params")
+        print(cache_params)
         capacity = cache_params[2]
         replacement_policy = cache_params[3]
         memcache_obj.refreshConfiguration(capacity, replacement_policy)
+        print(memcache_obj)
         return get_response(True)
     return None
 

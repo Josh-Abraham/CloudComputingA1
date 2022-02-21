@@ -42,7 +42,7 @@ def get_cache(cache):
                 response = super().popitem()
                 if(response != None):
                     (key, value) = response
-                    self.current_size -= len(value)
+                    self.current_size -= len(value.encode('utf-8'))
                     return(key, value)
             return None
 
@@ -61,7 +61,7 @@ def get_cache(cache):
             if(response != None):
                 (_, value) = response
                 super().pop(key)
-                self.current_size -= len(value)
+                self.current_size -= len(value.encode('utf-8'))
                 return "OK"
             return None
         
@@ -72,10 +72,11 @@ def get_cache(cache):
 
         def refreshConfiguration(self, size, replacement_policy):
             self.replace_policy = replacement_policy
-            self.__copy__(size)
-            return "OK"
-
+            self.resized_cache(size)
+            return self.__copy__(size)
+            
         def __copy__(self, size):
+            print(self.replace_policy)
             if (self.replace_policy == constants.LRU):
                 base_cache = get_cache(LRUCache)
             else:
@@ -99,13 +100,15 @@ def get_cache(cache):
             return response
 
         def __setitem__(self, key, value):
-            if(self.current_size + len(value) >= self.maximum_size):
-                while(self.current_size + len(value)>= self.maximum_size and self.currsize > 0):
+            if(self.current_size + len(value.encode('utf-8')) >= self.maximum_size):
+                while(self.current_size + len(value.encode('utf-8'))>= self.maximum_size and self.currsize > 0):
                     self.popitem()
-
-            if(key != None and value != None):
+            print(self.maximum_size)
+            print(self.current_size)
+            print(len(value.encode('utf-8')))
+            if(key != None and value != None and (self.current_size + len(value.encode('utf-8'))) <= self.maximum_size):
                 super().__setitem__(key, value)
-                self.current_size +=  len(value)
+                self.current_size +=  len(value.encode('utf-8'))
                 return True
             return False
 

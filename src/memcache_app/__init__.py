@@ -1,6 +1,6 @@
 from flask import Flask
 from memcache_app import memcache
-from cachetools import LRUCache
+from cachetools import LRUCache, RRCache
 import requests
 from app.db_connection import get_db
 import os
