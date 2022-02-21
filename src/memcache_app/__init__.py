@@ -19,6 +19,18 @@ event = threading.Event()
 lock = threading.Lock()
 
 def background_job(db_config, memcache_obj):
+    """ Background Job to update the statistics of memcache 
+     Parameters:
+            db_config: dictionary containing the database configuration
+            memcache_obj: the global memcache object, whose statistics are
+                            being stored in cache_stats tables
+
+        Return:
+            string -> "success"
+    This method runs on a different thread and this is how it doesn't interfere with 
+    webapplication requests.
+
+    """
     print("Background Job Start")
 
     while True:

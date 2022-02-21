@@ -3,6 +3,14 @@ from io import BytesIO
 from matplotlib.figure import Figure
 
 def prepare_data(rows):
+    """ Prepare the data for plotting
+    This method transforms the given data in dictionary for plotting the graph
+        Parameters:
+            rows (array of dictionary): an array of rows from cache_stats table
+
+        Return:
+            tuple: (time data, cache_statistics data )
+    """
     x_data = {'x-axis': [] }
     y_data = { 'miss': [], 'hit': [], 'request_count': [], 'cache_size': [], 'cache_count': []}
     for row in rows:
@@ -16,6 +24,16 @@ def prepare_data(rows):
     return (x_data, y_data)
 
 def plot_graphs(data_x_axis, data_y_axis, y_label):
+    """ Prepare the data for plotting
+    This method plots the graph
+        Parameters:
+            data_x_axis: array of time elements (X-axis for all graphs)
+            data_y_axis: array of Y-axis elements
+            y-lable: sets the label for Y-axis
+
+        Return:
+            graph in Base64 form
+    """
     print("plot graph started")
     # Generate the figure **without using pyplot**.
     fig = Figure(tight_layout=True)
