@@ -1,15 +1,14 @@
 from flask import Flask
 from memcache_app import memcache
-from cachetools import LRUCache, RRCache
 import requests
+from memcache_app import config
 from app.db_connection import get_db
 import os
 from app.config import db_config
 webapp = Flask(__name__)
-global memcache_obj
 
-base_cache = memcache.get_cache(LRUCache)
-memcache_obj = base_cache(2)
+''' Default Type is LRU and default size is 2 MB'''
+config.memcache_obj = memcache.LRUMemCache(2)
 
 from memcache_app import memcache_rest
 import threading
@@ -18,11 +17,11 @@ from datetime import datetime
 event = threading.Event()
 lock = threading.Lock()
 
-def background_job(db_config, memcache_obj):
+def background_job(db_config):
     """ Background Job to update the statistics of memcache 
      Parameters:
             db_config: dictionary containing the database configuration
-            memcache_obj: the global memcache object, whose statistics are
+            config.memcache_obj: the global memcache object, whose statistics are
                             being stored in cache_stats tables
 
         Return:
@@ -41,11 +40,11 @@ def background_job(db_config, memcache_obj):
                                         host=db_config['host'], database=db_config['database'])
         cnx.autocommit = False
         cursor = cnx.cursor(buffered=True)
-        
         with lock:
             if threading.active_count() > 2 :
-                cursor.execute(query_add, (datetime.now(),memcache_obj.current_size, memcache_obj.currsize, 
-                                memcache_obj.access_count, memcache_obj.miss))
+                print("type of cache is: ", type(config.memcache_obj))
+                cursor.execute(query_add, (datetime.now(),config.memcache_obj.current_size, config.memcache_obj.currsize, 
+                                config.memcache_obj.access_count, config.memcache_obj.miss))
                 cnx.commit()
         cnx.close()
         
@@ -53,4 +52,4 @@ def background_job(db_config, memcache_obj):
     return "success" 
 
 print("main thread: native_id:", threading.get_native_id())
-threading.Thread(target=background_job, args= (db_config,memcache_obj)).start()
+threading.Thread(target=background_job, args= (db_config,)).start()
