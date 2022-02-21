@@ -49,10 +49,6 @@ def get():
     else:
         return response
 
-@webapp.route('/test/<key>/<value>')
-def test(key,value):
-    response=memcache_obj.pushitem(key,value)
-    return get_response(response)
 
 @webapp.route('/invalidate', methods = ['POST'])
 def invalidate():
@@ -102,11 +98,3 @@ def get_response(input=False):
 
     return response
 
-def get_response_no_key():
-    response = webapp.response_class(
-        response=json.dumps("Unknown key"),
-        status=400,
-        mimetype='application/json'
-    )
-
-    return response

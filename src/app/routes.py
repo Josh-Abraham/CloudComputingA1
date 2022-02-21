@@ -11,11 +11,13 @@ import json
 # Memcache host port
 cache_host = "http://localhost:5001"
 
+
 @webapp.before_first_request
 def set_cache_db_settings():
     """ Set cache settings on project mount
     """
     set_cache_params(conf.max_capacity, conf.replacement_policy)
+
 
 @webapp.teardown_appcontext
 def teardown_db(exception):
@@ -25,11 +27,13 @@ def teardown_db(exception):
     if db is not None:
         db.close()
 
+
 @webapp.errorhandler(404)
 def not_found(e):
     """ Error template goes back to home
     """
     return render_template("home.html")
+
 
 @webapp.route('/')
 @webapp.route('/home')
@@ -37,6 +41,7 @@ def home():
     """ Main route, as well as default location for 404s
     """
     return render_template("home.html")
+
 
 @webapp.route('/add_key', methods = ['GET','POST'])
 def add_key():
@@ -49,6 +54,7 @@ def add_key():
         status = save_image(request, key)
         return render_template("add_key.html", save_status=status)
     return render_template("add_key.html")
+
 
 @webapp.route('/show_image', methods = ['GET','POST'])
 def show_image():
@@ -89,14 +95,6 @@ def show_image():
     return render_template('show_image.html')
 
 
-@webapp.route("/get_image/<filename>")
-def get_image(filename):
-    """ This endpoint just returns the image
-    The key is the filename with extension
-    """
-    filepath = "static/images/" + filename
-    return send_file(filepath)
-
 @webapp.route('/key_store')
 def key_store():
     """ Get list of all keys currently in the database
@@ -119,6 +117,7 @@ def key_store():
     else:
         return render_template('key_store.html')
 
+
 @webapp.route('/cache_stats')
 def cache_stats():
     """ Endpoint to show the cache statistics
@@ -134,15 +133,16 @@ def cache_stats():
     cursor.execute(query, (start_time, stop_time))
     rows = cursor.fetchall()
     cnx.close()
-    
+
     (x_data, y_data) = prepare_data(rows)
     image_map = {}
     for k,v in y_data.items():
         image_map[k] = plot_graphs(x_data['x-axis'], v, k)
 
-    return render_template('cache_stats.html', cache_count_plot = image_map['cache_count'], 
-                            request_plot = image_map['request_count'], cache_size_plot = image_map['cache_size'], 
+    return render_template('cache_stats.html', cache_count_plot = image_map['cache_count'],
+                            request_plot = image_map['request_count'], cache_size_plot = image_map['cache_size'],
                              hit_plot = image_map['hit'], miss_plot = image_map['miss'])
+
 
 @webapp.route('/memcache_params', methods = ['GET','POST'])
 def memcache_params():
@@ -190,7 +190,6 @@ def memcache_params():
     return render_template('memcache_params.html', capacity=capacity, replacement_policy=replacement_policy, update_time=date)
 
 
-
 @webapp.route('/api/list_keys', methods = ['POST'])
 def list_keys():
     """
@@ -215,6 +214,7 @@ def list_keys():
     except Exception as e:
         error_message={"success":"false" , "error":{"code":"500 Internal Server Error", "message":"Something Went Wrong"}}
         return(jsonify(error_message))
+
 
 @webapp.route('/api/key/<string:key_value>', methods = ['POST'])
 def one_key(key_value):
