@@ -2,6 +2,8 @@ from memcache_app import memcache_obj, webapp
 from app.cache_utils import get_cache_params
 from flask import request
 import json
+from app.db_connection import get_db
+import time
 
 @webapp.route('/put', methods = ['POST'])
 def put():
@@ -104,15 +106,6 @@ def get_response_no_key():
     response = webapp.response_class(
         response=json.dumps("Unknown key"),
         status=400,
-        mimetype='application/json'
-    )
-
-    return response
-
-def put_response():
-    response = webapp.response_class(
-        response=json.dumps("OK"),
-        status=200,
         mimetype='application/json'
     )
 

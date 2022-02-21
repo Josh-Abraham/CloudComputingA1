@@ -24,8 +24,8 @@ The memcache is used to store the most recently searched images within the syste
 The UI is used to navigate the system and do things like: add images, list keys, get images by key, reset memcache, and view memcache statistics
 
 ## Project Usage
-To use this project you need to have `Flask, gunicorn, cachetools, mysql.connector`
-You also need ot have mysql installed, and then run the SQL commands in `/database/ImageStore.sql`
+To use this project you need to have `Flask, gunicorn, cachetools, mysql.connector, matplotlib.figure`
+You also need to have mysql installed, and then run the SQL commands in `/database/ImageStore.sql`
 
 To run the project move the `start.sh` file up one level to the parent directory
 Then run `./start.sh` to start both applications
