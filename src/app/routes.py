@@ -120,6 +120,11 @@ def key_store():
 
 @webapp.route('/cache_stats')
 def cache_stats():
+    """ Endpoint to show the cache statistics
+    Generates and displays the 5 graphs/plots pertaining to the statistics
+    of the memcache for the past 10 minutes.
+    Display image as Base64
+    """
     cnx = get_db()
     cursor = cnx.cursor(dictionary=True)
     stop_time = datetime.datetime.now()
