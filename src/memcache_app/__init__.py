@@ -47,8 +47,6 @@ def background_job(db_config, memcache_obj):
                 cursor.execute(query_add, (datetime.now(),memcache_obj.current_size, memcache_obj.currsize, 
                                 memcache_obj.access_count, memcache_obj.miss))
                 cnx.commit()
-                print("DB Write Done: -> active_count is :", threading.active_count())
-                print("Thread native_id is: ", threading.get_native_id())
         cnx.close()
         
     print("Exit Background Job")

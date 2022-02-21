@@ -98,3 +98,35 @@ h3 {
   left: 500px;
   width: 145px;
 }
+
+.plot {
+	flex-grow:1
+}
+
+
+.plot-row {
+	display:flex;
+	flex-direction: row;
+}
+
+.plot-grid {
+	display:flex;
+	flex-direction: column;
+}
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 200px;
+text-align: center
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: center;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}

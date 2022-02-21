@@ -34,7 +34,7 @@ def plot_graphs(data_x_axis, data_y_axis, y_label):
         Return:
             graph in Base64 form
     """
-    print("plot graph started")
+    
     # Generate the figure **without using pyplot**.
     fig = Figure(tight_layout=True)
     ax = fig.subplots()

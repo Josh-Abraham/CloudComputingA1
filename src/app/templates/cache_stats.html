@@ -8,42 +8,53 @@
         {% include "top_bar.html" %}
         <h3>Statistics of last 10 minutes</h3>
         <br>
-        <div>
+        <div class="plot-grid">
+			<div class="plot-row">
             {% if cache_count_plot is defined %}
-                <h4>Statistics on Cache Item Count:</h4>
-                <img src= "data:image/png;base64, {{cache_count_plot}}" alt={{cache_count_plot}}  class="image-preview"/>
+				<div class="plot">
+                	<h4>Statistics on Cache Item Count:</h4>
+                	<img src= "data:image/png;base64, {{cache_count_plot}}" alt={{cache_count_plot}}  class="image-preview"/>
+				</div>
             {% else %}
                 <h4>Statistics on Cache Item not available</h4>
             {% endif %}
-            <br>
+            
             
             {% if cache_size_plot is defined %}
-                <h4>Statistics on Cache Size(In Bytes):</h4>
-                <img src= "data:image/png;base64, {{cache_size_plot}}" alt={{cache_size_plot}}  class="image-preview"/>
+				<div class="plot">
+                	<h4>Statistics on Cache Size(In Bytes):</h4>
+                	<img src= "data:image/png;base64, {{cache_size_plot}}" alt={{cache_size_plot}}  class="image-preview"/>
+				</div>
             {% else %}
                 <h4>Statistics on Cache Size not available</h4>
             {% endif %}
-            <br>
-
+			</div>
+			<div class="plot-row">
+            
             {% if request_plot is defined %}
-                <h4>Statistics on Requests:</h4>
-                <img src= "data:image/png;base64, {{request_plot}}" alt={{request_plot}}  class="image-preview"/>
+				<div class="plot">
+                	<h4>Statistics on Number of Requests:</h4>
+                	<img src= "data:image/png;base64, {{request_plot}}" alt={{request_plot}}  class="image-preview"/>
+				</div>
             {% else %}
                 <h4>Statistics on Requests Not Available</h4>
             {% endif %}
-            <br>
-            
+                        
             {% if miss_plot is defined %}
-                <h4>Statistics on Misses:</h4>
-                <img src= "data:image/png;base64, {{miss_plot}}" alt={{miss_plot}}  class="image-preview"/>
+				<div class="plot">
+                	<h4>Statistics on Number of Misses:</h4>
+                	<img src= "data:image/png;base64, {{miss_plot}}" alt={{miss_plot}}  class="image-preview"/>
+				</div>
             {% else %}
                 <h4>Statistics on Misses Not Available</h4>
             {% endif %}
-            <br>
-
+			</div>
+            
             {% if hit_plot is defined %}
-                <h4>Statistics on Hits:</h4>
-                <img src= "data:image/png;base64, {{hit_plot}}" alt={{hit_plot}}  class="image-preview"/>
+				<div class="plot">
+                	<h4>Statistics on Number of Hits:</h4>
+                	<img src= "data:image/png;base64, {{hit_plot}}" alt={{hit_plot}}  class="image-preview"/>
+				</div>
             {% else %}
                 <h4>Statistics on Hits Not Available</h4>
             {% endif %}

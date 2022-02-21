@@ -158,7 +158,7 @@ def memcache_params():
         capacity = cache_params[2]
         replacement_policy = cache_params[3]
     else:
-        # Error catchign case, will set to 0 values so it startups gracefully
+        # Error catching case, will set to 0 values so it startups gracefully
         update_time = time.ctime(time.time())
         capacity = 0
         replacement_policy = "Least Recently Used"
@@ -176,7 +176,7 @@ def memcache_params():
         else:
             # Check new cache paramters
             new_cap = request.form.get('capacity')
-            if new_cap.isdigit():
+            if new_cap.isdigit() and int(new_cap) <= 500:
                 new_policy = request.form.get('replacement_policy')
                 new_time = set_cache_params(new_cap, new_policy)
                 if not new_time == None:
