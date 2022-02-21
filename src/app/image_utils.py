@@ -21,7 +21,7 @@ def save_image(request, key):
         file = request.files['file']
         _, extension = os.path.splitext(file.filename)
 
-        if extension in ALLOWED_EXTENSIONS:
+        if extension.lower() in ALLOWED_EXTENSIONS:
             filename = key + extension
             file.save(os.path.join(UPLOAD_FOLDER, filename))
             jsonReq = {"key":key}
@@ -33,7 +33,7 @@ def save_image(request, key):
         if response.status_code == 200:
             _, extension = os.path.splitext(img_url)
             filename = key + extension
-            if extension in ALLOWED_EXTENSIONS:
+            if extension.lower() in ALLOWED_EXTENSIONS:
                 with open(UPLOAD_FOLDER + "/" + filename, 'wb') as f:
                     f.write(response.content)
                 jsonReq = {"key":key}
@@ -100,7 +100,7 @@ def save_image_automated(request, key):
         file = request.files['file']
         _, extension = os.path.splitext(file.filename)
         extension=extension.lower()
-        if extension in ALLOWED_EXTENSIONS:
+        if extension.lower() in ALLOWED_EXTENSIONS:
             filename = key + extension
             file.save(os.path.join(UPLOAD_FOLDER, filename))
             jsonReq = {"key":key}
