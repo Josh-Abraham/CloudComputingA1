@@ -2,10 +2,11 @@ from app import UPLOAD_FOLDER
 import os, requests, base64
 from app.db_connection import get_db
 
-ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg'}
+ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif'}
 
 def save_image(request, key):
-    """ Save the image into local storage, calls write_to_db, and invalidates
+    """ check if the file or url in request is an image and save into local storage,
+        calls write_to_db, and invalidates
         memcache for the key if it is in the memcache
 
         Parameters:
@@ -19,7 +20,7 @@ def save_image(request, key):
     if img_url == "":
         file = request.files['file']
         _, extension = os.path.splitext(file.filename)
-        
+
         if extension in ALLOWED_EXTENSIONS:
             filename = key + extension
             file.save(os.path.join(UPLOAD_FOLDER, filename))
@@ -78,20 +79,34 @@ def write_img_db(image_key, image_tag):
         cursor.execute(query_add,(image_key,image_tag))
         cnx.commit()
         cnx.close()
-
         return "OK"
     except:
         return "FAILURE"
 
 def save_image_automated(request, key):
+    """ check if the file in request is an image and save into local storage,
+        calls write_to_db, and invalidates
+        memcache for the key if it is in the memcache-
+        function used only for automatic endpoint
+
+        Parameters:
+            request (request module): holds the form data for the image save
+            key (str): key to reference the file
+
+        Return:
+            response (str): "OK" or "ERROR"
+    """
     try:
         file = request.files['file']
         _, extension = os.path.splitext(file.filename)
-        filename = key + extension
-        file.save(os.path.join(UPLOAD_FOLDER, filename))
-        jsonReq = {"key":key}
-        res = requests.post('http://localhost:5001/invalidate', json=jsonReq)
-        return write_img_db(key, filename)
+        extension=extension.lower()
+        if extension in ALLOWED_EXTENSIONS:
+            filename = key + extension
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            jsonReq = {"key":key}
+            res = requests.post('http://localhost:5001/invalidate', json=jsonReq)
+            return write_img_db(key, filename)
+        return "INVALID"
 
     except:
         return "INVALID"
