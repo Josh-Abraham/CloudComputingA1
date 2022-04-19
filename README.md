@@ -2,6 +2,8 @@
 
 Assignment 1 for ECE 1779
 
+## Group Contributions
+![group_contributions](https://github.com/Josh-Abraham/CloudComputingA1/blob/main/src/contribs.jpg?raw=true)
 ## Project Architecture
 ### 2 Flask applications: 
 
